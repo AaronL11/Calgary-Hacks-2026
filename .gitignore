@@ -134,3 +134,10 @@ client/functions-dist
 
 # Virtual environment directory
 .venv
+
+# Database schema documentation
+DATABASE_SCHEMA.md
+
+# Presentation files
+PRESENTATION_OUTLINE.md
+
