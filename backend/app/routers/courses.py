@@ -5,19 +5,17 @@ from typing import List
 router = APIRouter()
 
 
-@router.get("", response_model=List[dict])
+@router.get("", response_model=List[schemas.CourseOut])
 async def list_courses(request: Request):
     db = request.app.state.db
     cur = db.courses.find().sort([("courseCode", 1)])
     items = []
     async for doc in cur:
-        # Ensure ObjectId values are converted to strings for JSON serialization
+        # convert to Pydantic model so FastAPI handles ObjectId encoding
         try:
-            if doc.get("_id") is not None:
-                doc["_id"] = str(doc.get("_id"))
+            items.append(schemas.CourseOut.parse_obj(doc))
         except Exception:
-            pass
-        items.append(doc)
+            items.append(doc)
     return items
 
 

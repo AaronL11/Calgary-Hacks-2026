@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from ..models import schemas
 from .users import get_current_user
+from typing import List
 
 router = APIRouter()
 
@@ -9,7 +10,7 @@ def _objid(id_str: str):
     return __import__("bson").ObjectId(id_str)
 
 
-@router.get("/problem/{problem_id}")
+@router.get("/problem/{problem_id}", response_model=List[schemas.ResponseOut])
 async def get_responses(problem_id: str, request: Request):
     db = request.app.state.db
     cur = db.responses.find({"problemId": _objid(problem_id)}).sort([("upvotes", -1)])
@@ -24,11 +25,14 @@ async def get_responses(problem_id: str, request: Request):
                     doc["authorUsername"] = user.get("username")
         except Exception:
             pass
-        items.append(doc)
+        try:
+            items.append(schemas.ResponseOut.parse_obj(doc))
+        except Exception:
+            items.append(doc)
     return items
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=schemas.ResponseOut)
 async def create_response(payload: schemas.ResponseCreate, request: Request, current_user: dict = Depends(get_current_user)):
     db = request.app.state.db
     now = __import__("datetime").datetime.utcnow()
@@ -48,12 +52,18 @@ async def create_response(payload: schemas.ResponseCreate, request: Request, cur
         created["authorUsername"] = current_user.get("username")
     except Exception:
         pass
-    return created
+    try:
+        return schemas.ResponseOut.parse_obj(created)
+    except Exception:
+        return created
 
-@router.post("/{response_id}/vote")
+@router.post("/{response_id}/vote", response_model=schemas.ResponseOut)
 async def vote_response(response_id: str, request: Request):
     db = request.app.state.db
     body = await request.json()
     delta = int(body.get("delta", 1))
     res = await db.responses.find_one_and_update({"_id": _objid(response_id)}, {"$inc": {"upvotes": delta}}, return_document=True)
-    return res
+    try:
+        return schemas.ResponseOut.parse_obj(res)
+    except Exception:
+        return res

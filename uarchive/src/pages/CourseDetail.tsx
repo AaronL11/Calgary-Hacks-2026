@@ -1,12 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
-import {
-  MOCK_COURSES,
-  MOCK_SUMMARIES,
-  type Course,
-  type Summary,
-} from "../data/mockData";
+import { type Course, type Summary } from "../data/mockData";
+import { listSummaries, listCourses } from "../lib/api";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { useState } from "react";
 
 function TagPill({ text }: { text: string }) {
   return (
@@ -151,20 +147,38 @@ function SummaryCard({ summary }: { summary: Summary }) {
 export default function CourseDetail() {
   const [searchParams] = useSearchParams();
   const courseCode = searchParams.get("code") || "CPSC 413";
-
   const [sortBy, setSortBy] = useState<"votes" | "recent">("votes");
+  const [course, setCourse] = useState<Course | null>(null);
+  const [summaries, setSummaries] = useState<Summary[]>([]);
 
-  // Find the course
-  const course = MOCK_COURSES.find((c) => c.courseCode === courseCode);
+  useEffect(() => {
+    let mounted = true;
+    // load course info from backend list
+    listCourses()
+      .then((courses) => {
+        if (!mounted) return;
+        const found = (courses as Course[]).find((c) => c.courseCode === courseCode);
+        setCourse(found ?? null);
+      })
+      .catch(() => {});
 
-  // Find related summaries
-  let summaries = MOCK_SUMMARIES.filter((s) => s.courseCode === courseCode);
+    listSummaries(courseCode)
+      .then((s) => {
+        if (!mounted) return;
+        setSummaries(s as Summary[]);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, [courseCode]);
 
   // Apply sorting
-  summaries = [...summaries].sort((a, b) => {
-    if (sortBy === "votes") return b.votes - a.votes;
+  const sortedSummaries = [...summaries].sort((a, b) => {
+    if (sortBy === "votes") return (b.votes || 0) - (a.votes || 0);
     if (sortBy === "recent")
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
     return 0;
   });
 
@@ -257,7 +271,7 @@ export default function CourseDetail() {
           </div>
         </div>
 
-        {summaries.length === 0 ? (
+        {sortedSummaries.length === 0 ? (
           <Card>
             <div className="p-12 text-center">
               <p className="text-neutral-600">
@@ -273,7 +287,7 @@ export default function CourseDetail() {
           </Card>
         ) : (
           <div className="grid gap-6">
-            {summaries.map((summary) => (
+            {sortedSummaries.map((summary) => (
               <SummaryCard key={summary._id} summary={summary} />
             ))}
           </div>

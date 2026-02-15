@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request, HTTPException, Depends
 from ..models import schemas
 from ..services import auth as auth_service
 from .users import get_current_user
+from typing import List
 
 router = APIRouter()
 
@@ -10,7 +11,7 @@ def _objid(id_str: str):
     return __import__("bson").ObjectId(id_str)
 
 
-@router.get("")
+@router.get("", response_model=List[schemas.ProblemOut])
 async def list_problems(request: Request, courseId: str = None, courseCode: str = None):
     db = request.app.state.db
     q = {}
@@ -31,22 +32,15 @@ async def list_problems(request: Request, courseId: str = None, courseCode: str 
                 doc["courseCode"] = course.get("courseCode")
         except Exception:
             pass
-        # stringify ObjectId fields for JSON serialization
+        # convert to Pydantic model so FastAPI handles ObjectId encoding
         try:
-            if doc.get("_id") is not None:
-                doc["_id"] = str(doc.get("_id"))
+            items.append(schemas.ProblemOut.parse_obj(doc))
         except Exception:
-            pass
-        try:
-            if doc.get("courseId") is not None:
-                doc["courseId"] = str(doc.get("courseId"))
-        except Exception:
-            pass
-        items.append(doc)
+            items.append(doc)
     return items
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=schemas.ProblemOut)
 async def create_problem(payload: schemas.ProblemCreate, request: Request, current_user: dict = Depends(get_current_user)):
     db = request.app.state.db
     now = __import__("datetime").datetime.utcnow()
@@ -85,26 +79,13 @@ async def create_problem(payload: schemas.ProblemCreate, request: Request, curre
         created["authorUsername"] = current_user.get("username")
     except Exception:
         pass
-    # stringify ObjectId fields
     try:
-        if created.get("_id") is not None:
-            created["_id"] = str(created.get("_id"))
+        return schemas.ProblemOut.parse_obj(created)
     except Exception:
-        pass
-    try:
-        if created.get("courseId") is not None:
-            created["courseId"] = str(created.get("courseId"))
-    except Exception:
-        pass
-    try:
-        if created.get("authorId") is not None:
-            created["authorId"] = str(created.get("authorId"))
-    except Exception:
-        pass
-    return created
+        return created
 
 
-@router.get("/{problem_id}")
+@router.get("/{problem_id}", response_model=schemas.ProblemOut)
 async def get_problem(problem_id: str, request: Request):
     db = request.app.state.db
     doc = await db.problems.find_one({"_id": _objid(problem_id)})
@@ -116,34 +97,19 @@ async def get_problem(problem_id: str, request: Request):
             doc["courseCode"] = course.get("courseCode")
     except Exception:
         pass
-    # stringify ObjectId fields
     try:
-        if doc.get("_id") is not None:
-            doc["_id"] = str(doc.get("_id"))
+        return schemas.ProblemOut.parse_obj(doc)
     except Exception:
-        pass
-    try:
-        if doc.get("courseId") is not None:
-            doc["courseId"] = str(doc.get("courseId"))
-    except Exception:
-        pass
-    return doc
+        return doc
 
 
-@router.post("/{problem_id}/vote")
+@router.post("/{problem_id}/vote", response_model=schemas.ProblemOut)
 async def vote_problem(problem_id: str, request: Request):
     db = request.app.state.db
     body = await request.json()
     delta = int(body.get("delta", 1))
     res = await db.problems.find_one_and_update({"_id": _objid(problem_id)}, {"$inc": {"votes": delta}}, return_document=True)
     try:
-        if res and res.get("_id") is not None:
-            res["_id"] = str(res.get("_id"))
+        return schemas.ProblemOut.parse_obj(res)
     except Exception:
-        pass
-    try:
-        if res and res.get("courseId") is not None:
-            res["courseId"] = str(res.get("courseId"))
-    except Exception:
-        pass
-    return res
+        return res

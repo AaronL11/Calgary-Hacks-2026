@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
-import { MOCK_COURSES, type Course } from "../data/mockData";
+import { type Course } from "../data/mockData";
+import { listCourses } from "../lib/api";
 import Header from "../components/Header";
+import { useEffect, useState } from "react";
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
@@ -39,7 +41,18 @@ function CourseCard({ course }: { course: Course }) {
 }
 
 export default function Courses() {
-  const courses = MOCK_COURSES;
+  const [courses, setCourses] = useState<Course[]>([]);
+  useEffect(() => {
+    let mounted = true;
+    listCourses()
+      .then((data) => {
+        if (mounted) setCourses(data as Course[]);
+      })
+      .catch(() => {});
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
