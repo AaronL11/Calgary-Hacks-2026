@@ -135,7 +135,9 @@ function CommentCard({ comment }: { comment: Comment }) {
             <button onClick={() => handleVote("down")} className={`rounded-lg p-2 ${userVote === "down" ? "bg-red-100 text-red-700" : "hover:bg-neutral-100 text-neutral-600"}`}>▼</button>
           </div>
         </div>
-        <p className="mt-3 text-sm text-neutral-700 leading-relaxed">{comment.content}</p>
+        <div className="mt-3 text-sm text-neutral-700 leading-relaxed">
+          <MarkdownRenderer content={comment.content} />
+        </div>
       </div>
     </Card>
   );

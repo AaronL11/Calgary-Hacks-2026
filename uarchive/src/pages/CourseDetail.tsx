@@ -1,6 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { type Course, type Summary } from "../data/mockData";
 import { listSummaries, listCourses, voteSummary } from "../lib/api";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 
@@ -129,9 +130,9 @@ function SummaryCard({ summary }: { summary: Summary }) {
                 </div>
               </div>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-700">
-              {summary.content}
-            </p>
+            <div className="mt-3 text-sm leading-relaxed text-neutral-700">
+              <MarkdownRenderer content={summary.content} />
+            </div>
           </div>
         </div>
       </div>
