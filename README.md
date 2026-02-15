@@ -23,5 +23,3 @@ Problems Page: Here you can see a list of posts relating to a course, including 
 Problem Page: Here you can see an individual post relating to a course, as well as the comments made in reply to the post. You can also post your own comments here if you are logged in. <br>
 
 Post Page: From here you can either make a problem post under a given course, or you can post your own summary of a given course's contents.
-
-(Pictures shown above are old from development process)
