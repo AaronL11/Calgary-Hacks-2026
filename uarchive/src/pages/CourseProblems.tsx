@@ -1,12 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
-import {
-  MOCK_COURSES,
-  MOCK_PROBLEMS,
-  type Course,
-  type Problem,
-} from "../data/mockData";
+import { type Course, type Problem } from "../data/mockData";
+import { listProblems, listCourses } from "../lib/api";
+import { useEffect, useState } from "react";
 import Header from "../components/Header";
-import { useState } from "react";
 
 function TagPill({ text }: { text: string }) {
   return (
@@ -164,25 +160,45 @@ export default function CourseProblems() {
     "All" | "Easy" | "Medium" | "Hard"
   >("All");
 
-  // Find the course
-  const course = MOCK_COURSES.find((c) => c.courseCode === courseCode);
+  const [course, setCourse] = useState<Course | null>(null);
+  const [problems, setProblems] = useState<Problem[]>([]);
 
-  // Find related problems
-  let problems = MOCK_PROBLEMS.filter((p) => p.courseCode === courseCode);
+  useEffect(() => {
+    let mounted = true;
+    listCourses()
+      .then((courses) => {
+        if (!mounted) return;
+        const found = (courses as Course[]).find((c) => c.courseCode === courseCode);
+        setCourse(found ?? null);
+      })
+      .catch(() => {});
+
+    listProblems(courseCode)
+      .then((p) => {
+        if (!mounted) return;
+        setProblems(p as Problem[]);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, [courseCode]);
 
   // Apply difficulty filter
-  if (filterDifficulty !== "All") {
-    problems = problems.filter((p) => p.difficulty === filterDifficulty);
-  }
+  const filtered =
+    filterDifficulty === "All"
+      ? problems
+      : problems.filter((p) => p.difficulty === filterDifficulty);
 
   // Apply sorting
-  problems = [...problems].sort((a, b) => {
-    if (sortBy === "votes") return b.votes - a.votes;
+  const sortedProblems = [...filtered].sort((a, b) => {
+    if (sortBy === "votes") return (b.votes || 0) - (a.votes || 0);
     if (sortBy === "recent")
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
     if (sortBy === "difficulty") {
-      const diffOrder = { Easy: 1, Medium: 2, Hard: 3 };
-      return diffOrder[b.difficulty] - diffOrder[a.difficulty];
+      const diffOrder: any = { Easy: 1, Medium: 2, Hard: 3 };
+      return (diffOrder[b.difficulty] || 0) - (diffOrder[a.difficulty] || 0);
     }
     return 0;
   });
@@ -238,7 +254,7 @@ export default function CourseProblems() {
             <div>
               <h2 className="text-2xl font-bold">Problems & Takeaways</h2>
               <p className="mt-1 text-sm text-neutral-600">
-                {problems.length}{" "}
+                {problems.length} {" "}
                 {problems.length === 1 ? "problem" : "problems"} found
               </p>
             </div>
@@ -281,7 +297,7 @@ export default function CourseProblems() {
           </div>
         </div>
 
-        {problems.length === 0 ? (
+        {sortedProblems.length === 0 ? (
           <Card>
             <div className="p-12 text-center">
               <p className="text-neutral-600">
@@ -297,7 +313,7 @@ export default function CourseProblems() {
           </Card>
         ) : (
           <div className="grid gap-6">
-            {problems.map((problem) => (
+            {sortedProblems.map((problem) => (
               <ProblemCard key={problem._id} problem={problem} />
             ))}
           </div>

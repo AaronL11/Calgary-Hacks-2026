@@ -123,6 +123,46 @@ export async function listCourses(): Promise<CourseSummary[]> {
   return res.json();
 }
 
+export type ProblemSummary = {
+  _id?: string;
+  courseCode?: string;
+  title?: string;
+  [k: string]: any;
+};
+
+export async function listProblems(courseCode?: string): Promise<ProblemSummary[]> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const qs = courseCode ? `?courseCode=${encodeURIComponent(courseCode)}` : "";
+  const res = await fetch(`${API_BASE}/api/problems${qs}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export type SummarySummary = {
+  _id?: string;
+  courseCode?: string;
+  title?: string;
+  [k: string]: any;
+};
+
+export async function listSummaries(courseCode?: string): Promise<SummarySummary[]> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const qs = courseCode ? `?courseCode=${encodeURIComponent(courseCode)}` : "";
+  const res = await fetch(`${API_BASE}/api/summaries${qs}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
 export type SummaryCreateRequest = {
   courseId: string;
   title: string;
