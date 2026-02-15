@@ -143,6 +143,30 @@ export async function listProblems(courseCode?: string): Promise<ProblemSummary[
   return res.json();
 }
 
+export async function getProblem(id: string) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/problems/${encodeURIComponent(id)}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export async function listResponses(problemId: string) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/responses/problem/${encodeURIComponent(problemId)}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
 export type SummarySummary = {
   _id?: string;
   courseCode?: string;

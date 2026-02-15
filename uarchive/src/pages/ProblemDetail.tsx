@@ -1,7 +1,8 @@
 import { Link, useSearchParams } from "react-router-dom";
-import { MOCK_PROBLEMS, MOCK_RESPONSES, MOCK_COURSES, type Problem, type Response } from "../data/mockData";
+import { type Problem, type Response, type Course } from "../data/mockData";
 import Header from "../components/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getProblem, listResponses, listCourses } from "../lib/api";
 
 function TagPill({ text }: { text: string }) {
   return <span className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-xs text-neutral-700">{text}</span>;
@@ -114,14 +115,40 @@ export default function ProblemDetail() {
   const [sortBy, setSortBy] = useState<"votes" | "recent">("votes");
   const [problemVotes, setProblemVotes] = useState<number>(0);
   const [userProblemVote, setUserProblemVote] = useState<"up" | "down" | null>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
+  const [responses, setResponses] = useState<Response[]>([]);
+  const [course, setCourse] = useState<Course | null>(null);
 
-  // Find the problem
-  const problem = MOCK_PROBLEMS.find(p => p._id === problemId);
+  useEffect(() => {
+    let mounted = true;
+    getProblem(problemId)
+      .then((p) => {
+        if (!mounted) return;
+        setProblem(p as Problem);
+        setProblemVotes((p as any).votes || 0);
+      })
+      .catch(() => {});
 
-  // Initialize problem votes
-  if (problem && problemVotes === 0) {
-    setProblemVotes(problem.votes);
-  }
+    listResponses(problemId)
+      .then((r) => {
+        if (!mounted) return;
+        setResponses(r as Response[]);
+      })
+      .catch(() => {});
+
+    // find course info
+    listCourses()
+      .then((courses) => {
+        if (!mounted) return;
+        const found = (courses as Course[]).find((c) => c.courseCode === (problem?.courseCode || ""));
+        if (found) setCourse(found);
+      })
+      .catch(() => {});
+
+    return () => {
+      mounted = false;
+    };
+  }, [problemId]);
 
   const handleProblemVote = (type: "up" | "down") => {
     if (userProblemVote === type) {
@@ -140,14 +167,8 @@ export default function ProblemDetail() {
     }
   };
 
-  // Find the course
-  const course = problem ? MOCK_COURSES.find(c => c._id === problem.courseId) : null;
-
-  // Find responses
-  let responses = MOCK_RESPONSES.filter(r => r.problemId === problemId);
-
   // Sort responses
-  responses = [...responses].sort((a, b) => {
+  const sortedResponses = [...responses].sort((a, b) => {
     if (a.isAccepted) return -1;
     if (b.isAccepted) return 1;
 
@@ -180,7 +201,7 @@ export default function ProblemDetail() {
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-4xl px-4 py-8">
           <Link
-            to={`/course?code=${encodeURIComponent(problem.courseCode)}`}
+                to={`/course?code=${encodeURIComponent(problem.courseCode)}`}
             className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
           >
             ← Back to {problem.courseCode}
@@ -272,7 +293,7 @@ export default function ProblemDetail() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">
-              {responses.length} {responses.length === 1 ? 'Response' : 'Responses'}
+              {sortedResponses.length} {sortedResponses.length === 1 ? 'Response' : 'Responses'}
             </h2>
             <p className="mt-1 text-sm text-neutral-600">
               Student reflections and study tips
@@ -297,7 +318,7 @@ export default function ProblemDetail() {
           </div>
         </div>
 
-        {responses.length === 0 ? (
+        {sortedResponses.length === 0 ? (
           <Card>
             <div className="p-12 text-center">
               <p className="text-neutral-600">No responses yet. Be the first to share your insights!</p>
@@ -311,7 +332,7 @@ export default function ProblemDetail() {
           </Card>
         ) : (
           <div className="space-y-4">
-            {responses.map((response) => (
+            {sortedResponses.map((response) => (
               <ResponseCard key={response._id} response={response} />
             ))}
           </div>
