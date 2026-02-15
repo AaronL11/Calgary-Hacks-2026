@@ -1,9 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function Login() {
   const [isRegistering, setIsRegistering] = useState(false);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const auth = useAuth();
+  const navigate = useNavigate();
 
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
@@ -45,7 +51,19 @@ export default function Login() {
 
             <h1 className="text-2xl font-semibold text-center mb-6">Login</h1>
 
-            <form className="space-y-4">
+            <form
+              className="space-y-4"
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setError(null);
+                try {
+                  await auth.login(username, password);
+                  navigate("/");
+                } catch (err: any) {
+                  setError(err?.message || "Login failed");
+                }
+              }}
+            >
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-neutral-700 mb-1">
                   Username
@@ -53,7 +71,9 @@ export default function Login() {
                 <input
                   id="username"
                   type="text"
-                  placeholder="Enter your username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="Enter your username or email"
                   className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
               </div>
@@ -64,18 +84,22 @@ export default function Login() {
                 </label>
                 <input
                   id="password"
-                  type="password"
-                  placeholder="Enter your password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter your password"
                   className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
               </div>
-
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-uofc-red px-4 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
-              >
-                Login
-              </button>
+                <div>
+                  <button
+                    type="submit"
+                    className="w-full rounded-xl bg-uofc-red px-4 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
+                  >
+                    Login
+                  </button>
+                  {error && <div className="mt-2 text-sm text-red-600">{error}</div>}
+                </div>
             </form>
 
             <div className="mt-6 text-center">
