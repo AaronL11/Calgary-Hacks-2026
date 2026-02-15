@@ -9,6 +9,7 @@ import Register from "./pages/Register";
 import Search from "./pages/Search";
 import Post from "./pages/Post";
 import Profile from "./pages/Profile";
+import 'katex/dist/katex.min.css';
 
 export default function App() {
   return (

@@ -6,6 +6,7 @@ import {
   type Course,
   type Problem,
 } from "../data/mockData";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 
 const COURSES: Course[] = MOCK_COURSES.slice(0, 4);
 const TOP: Problem[] = MOCK_PROBLEMS.slice(0, 3);
@@ -209,7 +210,9 @@ export default function Home() {
                   ))}
                 </div>
 
-                <p className="mt-3 text-sm text-neutral-700">{s.takeaway}</p>
+                <p className="mt-3 text-sm text-neutral-700">
+                  <MarkdownRenderer content={s.takeaway} />
+                </p>
 
                 <div className="mt-4 flex gap-2">
                   <Link

@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { MOCK_PROBLEMS, MOCK_RESPONSES, MOCK_COURSES, type Problem, type Response } from "../data/mockData";
 import Header from "../components/Header";
 import { useState } from "react";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 
 function TagPill({ text }: { text: string }) {
   return <span className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-xs text-neutral-700">{text}</span>;
@@ -43,28 +44,25 @@ function ResponseCard({ response }: { response: Response }) {
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={() => handleVote("up")}
-              className={`rounded-lg p-2 transition-colors ${
-                userVote === "up"
-                  ? "bg-green-100 text-green-700"
-                  : "hover:bg-neutral-100 text-neutral-600"
-              }`}
+              className={`rounded-lg p-2 transition-colors ${userVote === "up"
+                ? "bg-green-100 text-green-700"
+                : "hover:bg-neutral-100 text-neutral-600"
+                }`}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
               </svg>
             </button>
-            <span className={`text-sm font-semibold ${
-              netVotes > 0 ? "text-green-600" : netVotes < 0 ? "text-red-600" : "text-neutral-600"
-            }`}>
+            <span className={`text-sm font-semibold ${netVotes > 0 ? "text-green-600" : netVotes < 0 ? "text-red-600" : "text-neutral-600"
+              }`}>
               {netVotes > 0 ? "+" : ""}{netVotes}
             </span>
             <button
               onClick={() => handleVote("down")}
-              className={`rounded-lg p-2 transition-colors ${
-                userVote === "down"
-                  ? "bg-red-100 text-red-700"
-                  : "hover:bg-neutral-100 text-neutral-600"
-              }`}
+              className={`rounded-lg p-2 transition-colors ${userVote === "down"
+                ? "bg-red-100 text-red-700"
+                : "hover:bg-neutral-100 text-neutral-600"
+                }`}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -95,7 +93,7 @@ function ResponseCard({ response }: { response: Response }) {
             </div>
 
             <p className="mt-3 text-sm leading-relaxed text-neutral-700">
-              {response.content}
+              <MarkdownRenderer content={response.content} />
             </p>
 
             <div className="mt-4 flex items-center gap-3 text-xs text-neutral-500">
@@ -174,7 +172,7 @@ export default function ProblemDetail() {
 
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
-        <Header />
+      <Header />
 
       {/* Problem Header */}
       <section className="border-b border-neutral-200 bg-white">
@@ -192,30 +190,27 @@ export default function ProblemDetail() {
               <div className="flex flex-col items-center gap-2">
                 <button
                   onClick={() => handleProblemVote("up")}
-                  className={`rounded-lg p-2 transition-colors ${
-                    userProblemVote === "up"
-                      ? "bg-green-100 text-green-700"
-                      : "hover:bg-neutral-100 text-neutral-600"
-                  }`}
+                  className={`rounded-lg p-2 transition-colors ${userProblemVote === "up"
+                    ? "bg-green-100 text-green-700"
+                    : "hover:bg-neutral-100 text-neutral-600"
+                    }`}
                 >
                   <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                   </svg>
                 </button>
-                <span className={`text-lg font-bold ${
-                  problemVotes > (problem?.votes || 0) ? "text-green-600" :
+                <span className={`text-lg font-bold ${problemVotes > (problem?.votes || 0) ? "text-green-600" :
                   problemVotes < (problem?.votes || 0) ? "text-red-600" :
-                  "text-neutral-900"
-                }`}>
+                    "text-neutral-900"
+                  }`}>
                   {problemVotes}
                 </span>
                 <button
                   onClick={() => handleProblemVote("down")}
-                  className={`rounded-lg p-2 transition-colors ${
-                    userProblemVote === "down"
-                      ? "bg-red-100 text-red-700"
-                      : "hover:bg-neutral-100 text-neutral-600"
-                  }`}
+                  className={`rounded-lg p-2 transition-colors ${userProblemVote === "down"
+                    ? "bg-red-100 text-red-700"
+                    : "hover:bg-neutral-100 text-neutral-600"
+                    }`}
                 >
                   <svg className="h-6 w-6" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -247,7 +242,9 @@ export default function ProblemDetail() {
               </div>
             </div>
 
-            <p className="mt-4 text-neutral-700">{problem.description}</p>
+            <p className="mt-4 text-neutral-700">
+              <MarkdownRenderer content={problem.description} />
+            </p>
 
             <div className="mt-4 flex flex-wrap gap-2">
               {problem.tags.map((tag) => <TagPill key={tag} text={tag} />)}
