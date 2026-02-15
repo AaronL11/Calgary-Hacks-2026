@@ -49,6 +49,19 @@ export interface User {
   joinedAt: string;
 }
 
+export interface Response {
+  _id: string;
+  problemId: string;
+  authorId: string;
+  authorUsername: string;
+  content: string;
+  upvotes: number;
+  downvotes: number;
+  isAccepted: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Dummy courses data
 export const MOCK_COURSES: Course[] = [
   {
@@ -329,6 +342,82 @@ export const MOCK_USERS: User[] = [
   }
 ];
 
+// Dummy responses/reflections data
+export const MOCK_RESPONSES: Response[] = [
+  {
+    _id: "resp_001",
+    problemId: "prob_001",
+    authorId: "user_002",
+    authorUsername: "sam_coder",
+    content: "This problem really helped me understand the difference between greedy and DP. I initially tried a greedy approach by always picking the largest available option, but that led to suboptimal results. The key insight is recognizing when you need to consider all possible states rather than just making a locally optimal choice. Building the recurrence relation helped me see why DP was necessary here.",
+    upvotes: 45,
+    downvotes: 2,
+    isAccepted: true,
+    createdAt: "2025-10-20T16:30:00Z",
+    updatedAt: "2025-10-22T10:15:00Z"
+  },
+  {
+    _id: "resp_002",
+    problemId: "prob_001",
+    authorId: "user_003",
+    authorUsername: "jordan_dev",
+    content: "I struggled with this one initially. What helped me was drawing out the state space and seeing that greedy choices could lead us down a path where we miss the optimal solution. The counterexample in the lecture slides was crucial - sometimes the greedy choice blocks you from better options later.",
+    upvotes: 28,
+    downvotes: 1,
+    isAccepted: false,
+    createdAt: "2025-10-21T14:45:00Z",
+    updatedAt: "2025-10-21T14:45:00Z"
+  },
+  {
+    _id: "resp_003",
+    problemId: "prob_001",
+    authorId: "user_004",
+    authorUsername: "casey_tech",
+    content: "Pro tip: Always write out your state definition BEFORE coding. If you can't clearly define what state you're tracking, you probably haven't understood the problem structure yet. For this problem, the state needed to track both position and remaining capacity.",
+    upvotes: 67,
+    downvotes: 3,
+    isAccepted: false,
+    createdAt: "2025-10-23T09:20:00Z",
+    updatedAt: "2025-11-15T11:30:00Z"
+  },
+  {
+    _id: "resp_004",
+    problemId: "prob_001",
+    authorId: "user_001",
+    authorUsername: "alex_student",
+    content: "The time complexity analysis was tricky here. Make sure you understand why memoization reduces it from exponential to polynomial. In the exam, they'll definitely ask you to justify the complexity, not just state it.",
+    upvotes: 34,
+    downvotes: 0,
+    isAccepted: false,
+    createdAt: "2025-11-05T13:10:00Z",
+    updatedAt: "2025-11-05T13:10:00Z"
+  },
+  {
+    _id: "resp_005",
+    problemId: "prob_002",
+    authorId: "user_001",
+    authorUsername: "alex_student",
+    content: "Exchange arguments are all about proving optimality. The pattern is: assume an optimal solution exists that doesn't follow your rule, show you can 'exchange' elements to make it follow your rule without making it worse, conclude that your rule must be in all optimal solutions. Practice identifying what property must hold in ANY optimal solution.",
+    upvotes: 89,
+    downvotes: 1,
+    isAccepted: true,
+    createdAt: "2025-12-01T10:30:00Z",
+    updatedAt: "2025-12-08T14:20:00Z"
+  },
+  {
+    _id: "resp_006",
+    problemId: "prob_002",
+    authorId: "user_003",
+    authorUsername: "jordan_dev",
+    content: "I found it helpful to work backwards - start with the optimal solution and ask 'what must be true about it?' For graph problems, this often relates to cuts, paths, or connectivity. Then prove that swapping elements maintains optimality.",
+    upvotes: 42,
+    downvotes: 2,
+    isAccepted: false,
+    createdAt: "2025-12-02T15:45:00Z",
+    updatedAt: "2025-12-02T15:45:00Z"
+  }
+];
+
 // Helper function to simulate API calls (replace with actual FastAPI calls later)
 export const api = {
   getCourses: async (): Promise<Course[]> => {
@@ -366,5 +455,15 @@ export const api = {
       c.professor.toLowerCase().includes(lowerQuery) ||
       c.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
     );
+  },
+  
+  getProblemById: async (id: string): Promise<Problem | null> => {
+    await new Promise(resolve => setTimeout(resolve, 200));
+    return MOCK_PROBLEMS.find(p => p._id === id) || null;
+  },
+  
+  getResponsesByProblem: async (problemId: string): Promise<Response[]> => {
+    await new Promise(resolve => setTimeout(resolve, 250));
+    return MOCK_RESPONSES.filter(r => r.problemId === problemId);
   }
 };

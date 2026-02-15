@@ -145,7 +145,7 @@ export default function Home() {
 
         <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {COURSES.map((c) => (
-            <Link key={c._id} to={`/courses?code=${encodeURIComponent(c.courseCode)}`}>
+            <Link key={c._id} to={`/course?code=${encodeURIComponent(c.courseCode)}`}>
               <Card>
                 <div className="p-5 hover:bg-neutral-50">
                   <p className="text-sm font-semibold">{c.courseCode}</p>
