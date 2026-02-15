@@ -28,7 +28,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
  <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/90 backdrop-blur">
-  <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+  <div className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
     <div className="flex items-center gap-3">
       <div className="leading-tight">
         <div className="text-sm font-semibold tracking-tight">UArchive</div>
@@ -40,14 +40,11 @@ export default function Home() {
       <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100" to="/courses">
         Browse
       </Link>
-      <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100" to="/leaderboard">
-        Leaderboard
-      </Link>
       <Link
         className="rounded-lg bg-uofc-red px-3 py-2 font-medium text-white hover:bg-uofc-darkred"
-        to="/submit"
+        to="/login"
       >
-        Submit
+        Login
       </Link>
     </nav>
   </div>
@@ -83,7 +80,7 @@ export default function Home() {
             Browse Courses
           </Link>
           <Link
-            to="/submit"
+            to="/login"
             className="rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-medium hover:bg-neutral-100"
           >
             Add a Problem
