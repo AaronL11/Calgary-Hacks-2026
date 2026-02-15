@@ -44,6 +44,13 @@ class UserAccount(BaseModel):
 
 class UserData(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    degree: Optional[str] = None
+    contributionCount: int = 0
+    reputation: int = 0
+    joinedAt: Optional[datetime] = None
+    lastLoginAt: Optional[datetime] = None
 
     class Config:
         json_encoders = {ObjectId: str}

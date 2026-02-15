@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
       try {
-        const envBase = (import.meta as any).env?.VITE_API_URL || "";
+        const envBase = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
         const base = envBase ? (envBase as string).replace(/\/+$/, "") : "";
         const url = base ? `${base}/api/users/me` : "/api/users/me";
         const res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });

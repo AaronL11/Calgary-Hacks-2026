@@ -2,7 +2,6 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from ..models import schemas
 from ..services import auth as auth_service
 from typing import Optional
-from jose import jwt
 
 router = APIRouter()
 
