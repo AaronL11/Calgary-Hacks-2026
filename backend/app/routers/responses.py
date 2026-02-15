@@ -1,0 +1,43 @@
+from fastapi import APIRouter, Request, HTTPException
+from ..models import schemas
+
+router = APIRouter()
+
+
+def _objid(id_str: str):
+    return __import__("bson").ObjectId(id_str)
+
+
+@router.get("/problem/{problem_id}")
+async def get_responses(problem_id: str, request: Request):
+    db = request.app.state.db
+    cur = db.responses.find({"problemId": _objid(problem_id)}).sort([("upvotes", -1)])
+    items = []
+    async for doc in cur:
+        items.append(doc)
+    return items
+
+
+@router.post("", status_code=201)
+async def create_response(payload: schemas.ResponseCreate, request: Request):
+    db = request.app.state.db
+    now = __import__("datetime").datetime.utcnow()
+    doc = payload.dict()
+    doc.update({
+        "problemId": _objid(payload.problemId),
+        "upvotes": 0,
+        "downvotes": 0,
+        "isAccepted": False,
+        "createdAt": now,
+        "updatedAt": now,
+    })
+    res = await db.responses.insert_one(doc)
+    return await db.responses.find_one({"_id": res.inserted_id})
+
+@router.post("/{response_id}/vote")
+async def vote_response(response_id: str, request: Request):
+    db = request.app.state.db
+    body = await request.json()
+    delta = int(body.get("delta", 1))
+    res = await db.responses.find_one_and_update({"_id": _objid(response_id)}, {"$inc": {"upvotes": delta}}, return_document=True)
+    return res
