@@ -223,7 +223,7 @@ export default function Home() {
                   </Link>
                   <Link
                     to="/courses"
-                    className="rounded-xl bg-uofc-red px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800"
+                    className="rounded-xl bg-uofc-red px-3 py-2 text-xs font-medium text-white hover:bg-uofc-darkred"
                   >
                     Browse more
                   </Link>

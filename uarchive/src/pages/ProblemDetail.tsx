@@ -449,7 +449,7 @@ export default function ProblemDetail() {
               <div className="mt-4 flex items-center gap-3">
                 <button
                   onClick={() => setShowResponseForm(true)}
-                  className="inline-block rounded-lg bg-neutral-900 px-6 py-3 text-sm font-medium text-white hover:bg-neutral-800"
+                  className="inline-block rounded-lg bg-uofc-red px-6 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
                 >
                   Contribute a Reflection
                 </button>
