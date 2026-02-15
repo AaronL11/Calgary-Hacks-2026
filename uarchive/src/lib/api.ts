@@ -66,3 +66,50 @@ export function setAuthToken(token: string | null) {
 export function getAuthToken(): string | null {
   return localStorage.getItem("auth_token");
 }
+
+export type ProblemCreateRequest = {
+  courseId: string;
+  title: string;
+  description: string;
+  tags?: string[];
+  difficulty?: string;
+  examType?: string;
+};
+
+export async function createProblem(data: ProblemCreateRequest) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/problems`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export type CourseSummary = {
+  _id?: string;
+  courseCode: string;
+  courseName?: string;
+  [k: string]: any;
+};
+
+export async function listCourses(): Promise<CourseSummary[]> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/courses`, {
+    method: "GET",
+    headers,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}

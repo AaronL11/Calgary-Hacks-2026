@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Depends
 from ..models import schemas
+from .users import get_current_user
 
 router = APIRouter()
 
@@ -14,17 +15,27 @@ async def get_responses(problem_id: str, request: Request):
     cur = db.responses.find({"problemId": _objid(problem_id)}).sort([("upvotes", -1)])
     items = []
     async for doc in cur:
+        # attach author username if possible
+        try:
+            author_id = doc.get("authorId")
+            if author_id:
+                user = await db.users.find_one({"_id": author_id})
+                if user:
+                    doc["authorUsername"] = user.get("username")
+        except Exception:
+            pass
         items.append(doc)
     return items
 
 
 @router.post("", status_code=201)
-async def create_response(payload: schemas.ResponseCreate, request: Request):
+async def create_response(payload: schemas.ResponseCreate, request: Request, current_user: dict = Depends(get_current_user)):
     db = request.app.state.db
     now = __import__("datetime").datetime.utcnow()
     doc = payload.dict()
     doc.update({
         "problemId": _objid(payload.problemId),
+        "authorId": current_user.get("_id"),
         "upvotes": 0,
         "downvotes": 0,
         "isAccepted": False,
@@ -32,7 +43,12 @@ async def create_response(payload: schemas.ResponseCreate, request: Request):
         "updatedAt": now,
     })
     res = await db.responses.insert_one(doc)
-    return await db.responses.find_one({"_id": res.inserted_id})
+    created = await db.responses.find_one({"_id": res.inserted_id})
+    try:
+        created["authorUsername"] = current_user.get("username")
+    except Exception:
+        pass
+    return created
 
 @router.post("/{response_id}/vote")
 async def vote_response(response_id: str, request: Request):

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
-import { useState } from "react";
-import { MOCK_COURSES } from "../data/mockData";
+import { useEffect, useState } from "react";
+import { createProblem, listCourses } from "../lib/api";
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
@@ -13,7 +13,22 @@ function Card({ children }: { children: React.ReactNode }) {
 
 export default function Post() {
   const [contentType, setContentType] = useState<"problem" | "summary">("problem");
-  const [courseCode, setCourseCode] = useState("");
+  const [courseId, setCourseId] = useState("");
+  const [courses, setCourses] = useState<any[]>([]);
+
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const data = await listCourses();
+        if (!mounted) return;
+        setCourses(data || []);
+      } catch (err) {
+        console.error("Failed to load courses", err);
+      }
+    })();
+    return () => { mounted = false; };
+  }, []);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [professor, setProfessor] = useState("");
@@ -24,18 +39,29 @@ export default function Post() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Handle form submission
-    console.log({
-      contentType,
-      courseCode,
-      title,
-      description,
-      professor: contentType === "summary" ? professor : undefined,
-      tags: tags.split(",").map((t) => t.trim()),
-      difficulty,
-      semester,
-      year,
-    });
+    (async () => {
+      try {
+        if (contentType === "problem") {
+          const payload = {
+            courseId: courseId,
+            title,
+            description,
+            tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+            difficulty: String(difficulty),
+            examType: "Submission",
+          };
+          const created = await createProblem(payload);
+          alert("Problem submitted successfully.");
+          // optionally navigate to created problem page
+          console.log("created problem", created);
+        } else {
+          alert("Course summary submission is not implemented yet.");
+        }
+      } catch (err: any) {
+        console.error(err);
+        alert("Failed to submit: " + (err?.message || err));
+      }
+    })();
   };
 
   return (
@@ -95,17 +121,22 @@ export default function Post() {
               </label>
               <select
                 id="courseCode"
-                value={courseCode}
-                onChange={(e) => setCourseCode(e.target.value)}
+                value={courseId}
+                onChange={(e) => setCourseId(e.target.value)}
                 required
                 className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
               >
                 <option value="">Select a course</option>
-                {MOCK_COURSES.map((course) => (
-                  <option key={course._id} value={course.courseCode}>
-                    {course.courseCode} - {course.courseName}
-                  </option>
-                ))}
+                {courses.map((course) => {
+                  const id = (course?._id && typeof course._id === "string")
+                    ? course._id
+                    : course?._id?._id || course?.id || String(course?._id);
+                  return (
+                    <option key={id} value={id}>
+                      {course.courseCode} - {course.courseName}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
