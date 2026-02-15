@@ -11,14 +11,13 @@ function Card({ children }: { children: React.ReactNode }) {
 }
 
 export default function Post() {
+  const [contentType, setContentType] = useState<"problem" | "summary">("problem");
   const [courseCode, setCourseCode] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [professor, setProfessor] = useState("");
   const [tags, setTags] = useState("");
-  const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">(
-    "Medium",
-  );
-  const [examType, setExamType] = useState("");
+  const [difficulty, setDifficulty] = useState(5);
   const [semester, setSemester] = useState("Fall");
   const [year, setYear] = useState(2026);
 
@@ -26,12 +25,13 @@ export default function Post() {
     e.preventDefault();
     // TODO: Handle form submission
     console.log({
+      contentType,
       courseCode,
       title,
       description,
+      professor: contentType === "summary" ? professor : undefined,
       tags: tags.split(",").map((t) => t.trim()),
       difficulty,
-      examType,
       semester,
       year,
     });
@@ -73,14 +73,47 @@ export default function Post() {
 
       <section className="mx-auto max-w-3xl px-4 py-8">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold">Contribute a Problem</h1>
+          <h1 className="text-3xl font-bold">
+            Contribute a Problem / Course Summary
+          </h1>
           <p className="mt-2 text-sm text-neutral-600">
-            Share a problem or exam question to help other students learn
+            Share a problem, exam question, or course content summary to help other students learn
           </p>
         </div>
 
         <Card>
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
+            {/* Content Type Selector */}
+            <div>
+              <label className="block text-sm font-medium text-neutral-900 mb-2">
+                Content Type *
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setContentType("problem")}
+                  className={`flex-1 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    contentType === "problem"
+                      ? "border-uofc-red bg-uofc-red text-white"
+                      : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+                  }`}
+                >
+                  Problem
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setContentType("summary")}
+                  className={`flex-1 rounded-lg border-2 px-4 py-3 text-sm font-medium transition-colors ${
+                    contentType === "summary"
+                      ? "border-uofc-red bg-uofc-red text-white"
+                      : "border-neutral-300 bg-white text-neutral-700 hover:bg-neutral-50"
+                  }`}
+                >
+                  Course Summary
+                </button>
+              </div>
+            </div>
+
             {/* Course Code */}
             <div>
               <label
@@ -111,7 +144,7 @@ export default function Post() {
                 htmlFor="title"
                 className="block text-sm font-medium text-neutral-900 mb-2"
               >
-                Problem Title *
+                {contentType === "problem" ? "Problem" : "Summary"} Title *
               </label>
               <input
                 id="title"
@@ -119,7 +152,9 @@ export default function Post() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                placeholder="e.g., DP: when a greedy-looking choice fails"
+                placeholder={contentType === "problem" 
+                  ? "e.g., DP: when a greedy-looking choice fails"
+                  : "e.g., Key concepts from Week 5"}
                 className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
               />
             </div>
@@ -138,31 +173,36 @@ export default function Post() {
                 onChange={(e) => setDescription(e.target.value)}
                 required
                 rows={4}
-                placeholder="Describe the problem and what makes it challenging..."
+                placeholder={contentType === "problem"
+                  ? "Describe the problem and what makes it challenging..."
+                  : "Summarize the key concepts and takeaways from this course content..."}
                 className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
               />
             </div>
 
-            {/* Exam Type and Term */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Professor (only for summaries) */}
+            {contentType === "summary" && (
               <div>
                 <label
-                  htmlFor="examType"
+                  htmlFor="professor"
                   className="block text-sm font-medium text-neutral-900 mb-2"
                 >
-                  Exam Type *
+                  Professor *
                 </label>
                 <input
-                  id="examType"
+                  id="professor"
                   type="text"
-                  value={examType}
-                  onChange={(e) => setExamType(e.target.value)}
+                  value={professor}
+                  onChange={(e) => setProfessor(e.target.value)}
                   required
-                  placeholder="e.g., Midterm, Final, Assignment"
+                  placeholder="e.g., Dr. Smith"
                   className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
               </div>
+            )}
 
+            {/* Semester */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="semester"
@@ -183,10 +223,7 @@ export default function Post() {
                   <option value="Summer">Summer</option>
                 </select>
               </div>
-            </div>
 
-            {/* Year and Difficulty */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="year"
@@ -205,28 +242,34 @@ export default function Post() {
                   className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
               </div>
+            </div>
 
-              <div>
-                <label
-                  htmlFor="difficulty"
-                  className="block text-sm font-medium text-neutral-900 mb-2"
-                >
-                  Difficulty *
-                </label>
-                <select
-                  id="difficulty"
-                  value={difficulty}
-                  onChange={(e) =>
-                    setDifficulty(e.target.value as "Easy" | "Medium" | "Hard")
-                  }
-                  required
-                  className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
-                >
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-              </div>
+            {/* Difficulty */}
+            <div>
+              <label
+                htmlFor="difficulty"
+                className="block text-sm font-medium text-neutral-900 mb-2"
+              >
+                Difficulty (1-10) *
+              </label>
+              <select
+                id="difficulty"
+                value={difficulty}
+                onChange={(e) => setDifficulty(parseInt(e.target.value))}
+                required
+                className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
+              >
+                <option value={1}>1 - Very Easy</option>
+                <option value={2}>2 - Easy</option>
+                <option value={3}>3 - Easy</option>
+                <option value={4}>4 - Medium</option>
+                <option value={5}>5 - Medium</option>
+                <option value={6}>6 - Medium</option>
+                <option value={7}>7 - Medium</option>
+                <option value={8}>8 - Hard</option>
+                <option value={9}>9 - Hard</option>
+                <option value={10}>10 - Very Hard</option>
+              </select>
             </div>
 
             {/* Tags */}
@@ -262,7 +305,7 @@ export default function Post() {
                 type="submit"
                 className="rounded-lg bg-uofc-red px-6 py-2 text-sm font-medium text-white hover:bg-uofc-darkred transition-colors"
               >
-                Submit Problem
+                Submit {contentType === "problem" ? "Problem" : "Summary"}
               </button>
             </div>
           </form>
@@ -273,8 +316,9 @@ export default function Post() {
           <ul className="mt-2 text-xs text-blue-800 space-y-1 list-disc list-inside">
             <li>Do not upload copyrighted exam materials</li>
             <li>Focus on the pattern or concept, not specific solutions</li>
-            <li>Be descriptive in your problem title</li>
-            <li>Tag appropriately to help others find similar problems</li>
+            <li>Be descriptive in your title</li>
+            <li>For summaries: Include the professor to help students find relevant content</li>
+            <li>Tag appropriately to help others find similar content</li>
           </ul>
         </div>
       </section>
