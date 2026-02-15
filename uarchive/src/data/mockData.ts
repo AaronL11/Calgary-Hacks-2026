@@ -62,6 +62,25 @@ export interface Response {
   updatedAt: string;
 }
 
+export interface Summary {
+  _id: string;
+  courseId: string;
+  courseCode: string;
+  title: string;
+  content: string;
+  authorId: string;
+  authorUsername: string;
+  votes: number;
+  tags: string[];
+  topic: string;
+  professor: string;
+  difficulty: number;
+  semester: string;
+  year: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Dummy courses data
 export const MOCK_COURSES: Course[] = [
   {
@@ -418,6 +437,154 @@ export const MOCK_RESPONSES: Response[] = [
   }
 ];
 
+// Dummy summaries data
+export const MOCK_SUMMARIES: Summary[] = [
+  {
+    _id: "summ_001",
+    courseId: "course_001",
+    courseCode: "CPSC 413",
+    title: "Dynamic Programming: State Definition & Transitions",
+    content: "The most crucial step in solving DP problems is correctly defining your state. Your state must capture all information needed to make future decisions. Common mistakes include: (1) Not identifying independent subproblems, (2) Including unnecessary information in state, (3) Failing to connect state transitions logically. Key pattern: If you're solving the same subproblem multiple times, you likely need memoization. Always sketch the state space before coding - include base cases, transitions, and final answer computation.",
+    authorId: "user_001",
+    authorUsername: "alex_student",
+    votes: 156,
+    tags: ["DP", "State", "Foundation"],
+    topic: "Dynamic Programming",
+    professor: "Dr. Sarah Johnson",
+    difficulty: 8,
+    semester: "Fall",
+    year: 2025,
+    createdAt: "2025-10-10T10:00:00Z",
+    updatedAt: "2025-12-15T14:30:00Z"
+  },
+  {
+    _id: "summ_002",
+    courseId: "course_001",
+    courseCode: "CPSC 413",
+    title: "Graph Algorithms: MST & Shortest Paths",
+    content: "Master the two main graph problem families: (1) Minimum Spanning Trees (Kruskal's/Prim's) - find optimal spanning structure, (2) Shortest Paths (Dijkstra/Bellman-Ford) - find optimal routes. Understand trade-offs: Kruskal's is easier to code, Prim's is better for dense graphs. For shortest paths, use Dijkstra for non-negative weights (greedy works), Bellman-Ford for negative weights. Key insight: Greedy works for MST and shortest paths because of optimal substructure + greedy choice property. Practice proving why the greedy choice is always safe.",
+    authorId: "user_002",
+    authorUsername: "sam_coder",
+    votes: 142,
+    tags: ["Graphs", "MST", "ShortestPath"],
+    topic: "Graph Algorithms",
+    professor: "Dr. Sarah Johnson",
+    difficulty: 7,
+    semester: "Fall",
+    year: 2025,
+    createdAt: "2025-11-05T14:20:00Z",
+    updatedAt: "2025-12-20T11:15:00Z"
+  },
+  {
+    _id: "summ_003",
+    courseId: "course_001",
+    courseCode: "CPSC 413",
+    title: "Complexity Analysis: Big-O, Big-Theta, Big-Omega",
+    content: "Understanding asymptotic notation is essential for algorithm analysis. Big-O (upper bound) tells you the worst case, Big-Omega (lower bound) tells you the best case, Big-Theta (tight bound) tells you the average case. When analyzing DP solutions, account for both time (number of subproblems × work per subproblem) and space (memoization table size). Common complexity pitfall: Not accounting for the cost of operations (e.g., string concatenation can be O(n)). Always clarify: number of subproblems, maximum number of transitions per state, and cost of each operation.",
+    authorId: "user_003",
+    authorUsername: "jordan_dev",
+    votes: 98,
+    tags: ["Complexity", "Analysis", "BigO"],
+    topic: "Algorithm Analysis",
+    professor: "Dr. Sarah Johnson",
+    difficulty: 6,
+    semester: "Fall",
+    year: 2025,
+    createdAt: "2025-11-15T09:30:00Z",
+    updatedAt: "2025-12-10T16:45:00Z"
+  },
+  {
+    _id: "summ_004",
+    courseId: "course_003",
+    courseCode: "CPSC 457",
+    title: "Process Scheduling: Algorithms & Trade-offs",
+    content: "Modern OS scheduling aims to balance CPU utilization, fairness, and response time. Key algorithms: (1) FCFS - simple but can cause convoy effect, (2) SJF - optimal average wait time but requires predicting burst time, (3) Round Robin - fair but context switching overhead, (4) Priority-based - real-time requirements but risk of starvation. Critical concept: Preemptive vs non-preemptive scheduling affects both fairness and performance. In exam answers, always mention fairness considerations and explain why your chosen algorithm provides good trade-offs for the scenario. Remember: no single algorithm is optimal for all workloads.",
+    authorId: "user_002",
+    authorUsername: "sam_coder",
+    votes: 124,
+    tags: ["Scheduling", "Performance", "Fairness"],
+    topic: "Process Management",
+    professor: "Dr. Emily Rodriguez",
+    difficulty: 7,
+    semester: "Fall",
+    year: 2025,
+    createdAt: "2025-10-18T13:45:00Z",
+    updatedAt: "2025-12-18T10:20:00Z"
+  },
+  {
+    _id: "summ_005",
+    courseId: "course_003",
+    courseCode: "CPSC 457",
+    title: "Memory Management: Paging & Virtual Memory",
+    content: "Virtual memory separates logical address space from physical address space. Paging divides both into fixed-size pages/frames. Key components: (1) Page table - maps virtual pages to physical frames, (2) TLB - hardware cache for page table entries (massive performance impact), (3) Page replacement algorithms - LRU is most common but FIFO/Optimal are still important conceptually. Critical failure mode: Thrashing occurs when processes spend more time paging than executing. To minimize page faults, keep working set in memory. When designing memory schemes for exams, discuss spatial/temporal locality and justifyframe allocation decisions.",
+    authorId: "user_004",
+    authorUsername: "casey_tech",
+    votes: 87,
+    tags: ["Memory", "Paging", "Virtual"],
+    topic: "Memory Management",
+    professor: "Dr. Emily Rodriguez",
+    difficulty: 8,
+    semester: "Fall",
+    year: 2025,
+    createdAt: "2025-11-02T11:00:00Z",
+    updatedAt: "2025-12-22T14:30:00Z"
+  },
+  {
+    _id: "summ_006",
+    courseId: "course_002",
+    courseCode: "CPSC 351",
+    title: "Formal Languages & Automata: DFA to Turing Machines",
+    content: "Build intuition for computational models from weakest to strongest: (1) DFA - finite state, can't match parentheses, (2) PDA - single stack, matches balanced parentheses, (3) Turing Machines - unbounded tape, universally computable. Key pattern: Each model extends the previous with more memory/power but becomes harder to design. To prove a language isn't in a class, use pumping lemma or closure properties. To prove decidability/recognition, construct an explicit automaton or TM. Critical insight: Church-Turing thesis claims TMs capture all computable functions - this is foundational to understand why some problems are inherently unsolvable.",
+    authorId: "user_001",
+    authorUsername: "alex_student",
+    votes: 167,
+    tags: ["Automata", "Languages", "Computation"],
+    topic: "Foundations of Computing",
+    professor: "Dr. Michael Chen",
+    difficulty: 9,
+    semester: "Winter",
+    year: 2026,
+    createdAt: "2025-12-01T15:30:00Z",
+    updatedAt: "2026-01-25T12:00:00Z"
+  },
+  {
+    _id: "summ_007",
+    courseId: "course_004",
+    courseCode: "CPSC 559",
+    title: "Consistency Models in Distributed Systems",
+    content: "Understanding consistency models is crucial for distributed system design. Spectrum from weakest to strongest: (1) Eventual Consistency - updates eventually propagate but no guarantees on timing, (2) Causal Consistency - respects causal relationships, (3) Strong Consistency - all nodes see same value immediately. Trade-off: Strong consistency is easier to program but harder to achieve with fault tolerance. Weak consistency enables availability but requires application-level handling of inconsistencies. CAP theorem states you can't have all three (Consistency, Availability, Partition tolerance) - choose your trade-off based on application needs. In exams, always justify consistency choice with specific failure scenarios.",
+    authorId: "user_003",
+    authorUsername: "jordan_dev",
+    votes: 112,
+    tags: ["Consistency", "Replication", "CAP"],
+    topic: "Distributed Computing",
+    professor: "Dr. James Kim",
+    difficulty: 9,
+    semester: "Winter",
+    year: 2026,
+    createdAt: "2026-01-10T10:45:00Z",
+    updatedAt: "2026-02-05T13:20:00Z"
+  },
+  {
+    _id: "summ_008",
+    courseId: "course_004",
+    courseCode: "CPSC 559",
+    title: "Fault Tolerance: Replication & Consensus",
+    content: "Distributed systems must handle failures gracefully. Two main strategies: (1) Replication - maintain copies on multiple nodes, handle inconsistency via consensus protocols (Paxos, Raft), (2) Sharding - partition data across nodes, reduce single-point failures. Consensus algorithms are the foundation: Paxos guarantees safety (consistency) but is complex, Raft is engineering-friendly version of Paxos. Byzantine Fault Tolerance needed only when nodes can actively deceive - more complex, rarely needed. Key metric: system tolerates f failures with 2f+1 (or 3f+1 for Byzantine) nodes. Practice: understand quorum requirements and why they're necessary for safety.",
+    authorId: "user_002",
+    authorUsername: "sam_coder",
+    votes: 89,
+    tags: ["Replication", "Consensus", "Faults"],
+    topic: "Distributed Computing",
+    professor: "Dr. James Kim",
+    difficulty: 10,
+    semester: "Winter",
+    year: 2026,
+    createdAt: "2026-01-15T14:15:00Z",
+    updatedAt: "2026-02-08T11:30:00Z"
+  }
+];
+
 // Helper function to simulate API calls (replace with actual FastAPI calls later)
 export const api = {
   getCourses: async (): Promise<Course[]> => {
@@ -465,5 +632,10 @@ export const api = {
   getResponsesByProblem: async (problemId: string): Promise<Response[]> => {
     await new Promise(resolve => setTimeout(resolve, 250));
     return MOCK_RESPONSES.filter(r => r.problemId === problemId);
+  },
+
+  getSummariesByCourse: async (courseCode: string): Promise<Summary[]> => {
+    await new Promise(resolve => setTimeout(resolve, 250));
+    return MOCK_SUMMARIES.filter(s => s.courseCode === courseCode);
   }
 };

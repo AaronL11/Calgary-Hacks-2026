@@ -1,9 +1,9 @@
 import { Link, useSearchParams } from "react-router-dom";
 import {
   MOCK_COURSES,
-  MOCK_SUMMARIES,
+  MOCK_PROBLEMS,
   type Course,
-  type Summary,
+  type Problem,
 } from "../data/mockData";
 import { useState } from "react";
 
@@ -39,8 +39,8 @@ function DifficultyBadge({ level }: { level: number }) {
   );
 }
 
-function SummaryCard({ summary }: { summary: Summary }) {
-  const [upvotes, setUpvotes] = useState(summary.votes > 0 ? summary.votes : 0);
+function ProblemCard({ problem }: { problem: Problem }) {
+  const [upvotes, setUpvotes] = useState(problem.votes > 0 ? problem.votes : 0);
   const [downvotes, setDownvotes] = useState(0);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
 
@@ -117,29 +117,32 @@ function SummaryCard({ summary }: { summary: Summary }) {
 
           {/* Content column */}
           <div className="flex-1">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-neutral-900">
-                    {summary.authorUsername}
-                  </span>
-                  <span className="text-xs text-neutral-500">•</span>
-                  <span className="text-xs text-neutral-600">
-                    {summary.professor}
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center gap-2 text-xs">
-                  <span className="text-neutral-500">
-                    {summary.semester} {summary.year}
-                  </span>
-                  <span className="text-neutral-500">•</span>
-                  <DifficultyBadge level={summary.difficulty} />
-                </div>
-              </div>
+            <h3 className="text-sm font-semibold">{problem.title}</h3>
+            <div className="mt-1 flex items-center gap-2 text-xs text-neutral-600">
+              <span>
+                {problem.semester} {problem.year}
+              </span>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-neutral-700">
-              {summary.content}
-            </p>
+
+            <p className="mt-3 text-sm text-neutral-700">{problem.description}</p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {problem.tags.map((t) => (
+                <TagPill key={t} text={t} />
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-xs text-neutral-500">
+                by {problem.authorUsername}
+              </span>
+              <Link
+                to={`/problem?id=${problem._id}`}
+                className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
+              >
+                View Details
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -147,23 +150,37 @@ function SummaryCard({ summary }: { summary: Summary }) {
   );
 }
 
-export default function CourseDetail() {
+export default function CourseProblems() {
   const [searchParams] = useSearchParams();
   const courseCode = searchParams.get("code") || "CPSC 413";
 
-  const [sortBy, setSortBy] = useState<"votes" | "recent">("votes");
+  const [sortBy, setSortBy] = useState<"votes" | "recent" | "difficulty">(
+    "votes",
+  );
+  const [filterDifficulty, setFilterDifficulty] = useState<
+    "All" | "Easy" | "Medium" | "Hard"
+  >("All");
 
   // Find the course
   const course = MOCK_COURSES.find((c) => c.courseCode === courseCode);
 
-  // Find related summaries
-  let summaries = MOCK_SUMMARIES.filter((s) => s.courseCode === courseCode);
+  // Find related problems
+  let problems = MOCK_PROBLEMS.filter((p) => p.courseCode === courseCode);
+
+  // Apply difficulty filter
+  if (filterDifficulty !== "All") {
+    problems = problems.filter((p) => p.difficulty === filterDifficulty);
+  }
 
   // Apply sorting
-  summaries = [...summaries].sort((a, b) => {
+  problems = [...problems].sort((a, b) => {
     if (sortBy === "votes") return b.votes - a.votes;
     if (sortBy === "recent")
       return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    if (sortBy === "difficulty") {
+      const diffOrder = { Easy: 1, Medium: 2, Hard: 3 };
+      return diffOrder[b.difficulty] - diffOrder[a.difficulty];
+    }
     return 0;
   });
 
@@ -250,88 +267,84 @@ export default function CourseDetail() {
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-8">
           <Link
-            to="/courses"
+            to={`/course?code=${courseCode}`}
             className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
           >
-            ← Back to all courses
+            ← Back to {courseCode}
           </Link>
 
-          <div className="mt-4 flex items-start justify-between gap-6">
-            <div className="flex-1">
-              <h1 className="text-3xl font-bold">{course.courseCode}</h1>
-              <h2 className="mt-2 text-xl text-neutral-700">
-                {course.courseName}
-              </h2>
-
-              <p className="mt-4 text-sm text-neutral-700">
-                {course.description}
-              </p>
-            </div>
-
-            <Card>
-              <div className="p-5 text-center">
-                <div className="text-3xl font-bold text-uofc-red">
-                  {course.problemCount}
-                </div>
-                <p className="mt-1 text-xs text-neutral-600">Problems Shared</p>
-
-                <Link
-                  to={`/course-problems?code=${courseCode}`}
-                  className="mt-4 block w-full rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred transition-colors"
-                >
-                  View Problems
-                </Link>
-
-                <Link
-                  to="/login"
-                  className="mt-2 block w-full rounded-lg border border-uofc-red bg-white px-4 py-2 text-sm font-medium text-uofc-red hover:bg-red-50 transition-colors"
-                >
-                  Contribute
-                </Link>
-              </div>
-            </Card>
+          <div className="mt-4">
+            <h1 className="text-3xl font-bold">{course.courseCode}</h1>
+            <h2 className="mt-2 text-xl text-neutral-700">
+              {course.courseName}
+            </h2>
+            <p className="mt-3 text-sm text-neutral-600">
+              View and explore exam problems and practice questions from this
+              course
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Summaries Section */}
+      {/* Problems Section */}
       <section className="mx-auto max-w-6xl px-4 py-8">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold">Course Content Summaries</h2>
+            <h2 className="text-2xl font-bold">Problems & Takeaways</h2>
+            <p className="mt-1 text-sm text-neutral-600">
+              {problems.length} {problems.length === 1 ? "problem" : "problems"}{" "}
+              found
+            </p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <label className="text-sm text-neutral-600">Sort by:</label>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
-              className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
-            >
-              <option value="votes">Most Votes</option>
-              <option value="recent">Most Recent</option>
-            </select>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-neutral-600">Difficulty:</label>
+              <select
+                value={filterDifficulty}
+                onChange={(e) => setFilterDifficulty(e.target.value as any)}
+                className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
+              >
+                <option value="All">All</option>
+                <option value="Easy">Easy</option>
+                <option value="Medium">Medium</option>
+                <option value="Hard">Hard</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm text-neutral-600">Sort by:</label>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as any)}
+                className="rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
+              >
+                <option value="votes">Most Votes</option>
+                <option value="recent">Most Recent</option>
+                <option value="difficulty">Difficulty</option>
+              </select>
+            </div>
           </div>
         </div>
 
-        {summaries.length === 0 ? (
+        {problems.length === 0 ? (
           <Card>
             <div className="p-12 text-center">
               <p className="text-neutral-600">
-                No summaries yet for this course.
+                No problems found for this filter.
               </p>
-              <Link
-                to="/login"
-                className="mt-4 inline-block rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
+              <button
+                onClick={() => setFilterDifficulty("All")}
+                className="mt-4 rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
               >
-                Be the first to contribute
-              </Link>
+                Clear Filters
+              </button>
             </div>
           </Card>
         ) : (
           <div className="grid gap-6">
-            {summaries.map((summary) => (
-              <SummaryCard key={summary._id} summary={summary} />
+            {problems.map((problem) => (
+              <ProblemCard key={problem._id} problem={problem} />
             ))}
           </div>
         )}
