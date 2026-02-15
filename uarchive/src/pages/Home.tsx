@@ -220,7 +220,7 @@ export default function Home() {
                   </Link>
                   <Link
                     to="/courses"
-                    className="rounded-xl bg-neutral-900 px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800"
+                    className="rounded-xl bg-uofc-red px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800"
                   >
                     Browse more
                   </Link>
