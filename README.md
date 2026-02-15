@@ -15,7 +15,7 @@ Home Page: This the page you are greeted to when you first enter the website. Fr
 Courses List Page: Here you can see a list of the courses with information currently on the website. 
 <img width="1852" height="785" alt="image" src="https://github.com/user-attachments/assets/eba1c095-6700-4e08-89eb-9156051f06b0" />
 
-Course Page: Here you can see student-posted summaries of the contents and difficulty of a given course. From here you can move to the 
+Course Page: Here you can see student-posted summaries of the contents and difficulty of a given course.
 <img width="1332" height="797" alt="image" src="https://github.com/user-attachments/assets/3f7de177-73b2-4442-aae9-6e3c464b4931" />
 
 Problems Page: Here you can see a list of posts relating to a course, including student posted practice problems and warnings of potentail unexpected pitfalls you may run into in the course. 
