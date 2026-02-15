@@ -19,7 +19,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
-from .database import connect, close
+from .database import connect, close, init_db
 from .routers import auth, users, courses, problems, responses, search
 
 logger = logging.getLogger("uvicorn.error")
@@ -85,6 +85,12 @@ def configure_event_loop_policy() -> None:
 async def lifespan(app: FastAPI):
     logger.info("LIFESPAN startup: connecting to database")
     await connect(app)
+    # Initialize collections / indexes
+    try:
+        await init_db(app)
+        logger.info("Database indexes ensured")
+    except Exception:
+        logger.exception("Failed to ensure database indexes")
     try:
         yield
     finally:

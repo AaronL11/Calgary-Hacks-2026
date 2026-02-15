@@ -11,6 +11,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 class Settings(BaseSettings):
     JWT_SECRET: str = "changeme"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    model_config = {"extra": "ignore"}
 
 
 settings = Settings(_env_file=".env", _env_file_encoding="utf-8")
