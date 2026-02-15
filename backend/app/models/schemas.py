@@ -16,7 +16,7 @@ class PyObjectId(ObjectId):
         return ObjectId(v)
 
 
-class UserCreate(BaseModel):
+class UserAccount(BaseModel):
     username: str = Field(..., min_length=3)
     email: EmailStr
     password: str = Field(..., min_length=6)
@@ -24,7 +24,7 @@ class UserCreate(BaseModel):
     yearOfStudy: Optional[int]
 
 
-class UserOut(BaseModel):
+class UserData(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     username: str
     email: EmailStr

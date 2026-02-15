@@ -25,12 +25,12 @@ async def get_current_user(request: Request):
     return user
 
 
-@router.get("/me", response_model=schemas.UserOut)
+@router.get("/me", response_model=schemas.UserData)
 async def me(current_user: dict = Depends(get_current_user)):
     return current_user
 
 
-@router.get("/{user_id}", response_model=schemas.UserOut)
+@router.get("/{user_id}", response_model=schemas.UserData)
 async def get_user(user_id: str, request: Request):
     db = request.app.state.db
     user = await db.users.find_one({"_id": __import__("bson").ObjectId(user_id)})

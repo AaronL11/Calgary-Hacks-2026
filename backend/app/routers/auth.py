@@ -7,8 +7,8 @@ from bson import ObjectId
 router = APIRouter()
 
 
-@router.post("/register", response_model=schemas.UserOut)
-async def register(user_in: schemas.UserCreate, request: Request):
+@router.post("/register", response_model=schemas.UserData)
+async def register(user_in: schemas.UserAccount, request: Request):
     db = request.app.state.db
     # uniqueness checks
     if await db.users.find_one({"username": user_in.username}):
