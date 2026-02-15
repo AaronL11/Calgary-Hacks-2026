@@ -5,6 +5,7 @@ import CourseDetail from "./pages/CourseDetail";
 import CourseProblems from "./pages/CourseProblems";
 import ProblemDetail from "./pages/ProblemDetail";
 import Login from "./pages/Login";
+import Register from "./pages/Register";
 import Search from "./pages/Search";
 import Post from "./pages/Post";
 
@@ -18,6 +19,7 @@ export default function App() {
       <Route path="/problem" element={<ProblemDetail />} />
       <Route path="/post" element={<Post />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
       <Route path="/search" element={<Search />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

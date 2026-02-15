@@ -1,4 +1,4 @@
-import bcrypt
+from passlib.hash import argon2
 from jose import jwt, JWTError
 from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -12,11 +12,11 @@ ALGORITHM = "HS256"
 security: HTTPBearer = HTTPBearer() # for JWT Bearer token
 
 def hash_password(password: str):
-    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    return argon2.hash(password)
 
 # Used in login:
-def verify_password(password: str, hashed_password: bytes):
-    return bcrypt.checkpw(password.encode("utf-8"), hashed_password)
+def verify_password(password: str, hashed_password: str):
+    return argon2.verify(password, hashed_password)
 
 def create_access_token(data: dict):
     return jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)

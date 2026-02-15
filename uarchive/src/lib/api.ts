@@ -18,8 +18,17 @@ export async function postLogin(data: LoginRequest) {
     body: JSON.stringify(data),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || "Login failed");
+    const err = await res.json().catch(() => null);
+    let message: any = err?.detail ?? err?.message ?? res.statusText;
+    if (Array.isArray(message)) {
+      message = message
+        .map((e: any) => {
+          if (e.loc) return `${e.loc.join(".")}: ${e.msg || JSON.stringify(e)}`;
+          return e.msg || JSON.stringify(e);
+        })
+        .join("; ");
+    }
+    throw new Error(typeof message === "string" ? message : JSON.stringify(message));
   }
   return res.json();
 }
@@ -31,8 +40,17 @@ export async function postRegister(data: RegisterRequest) {
     body: JSON.stringify(data),
   });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || "Registration failed");
+    const err = await res.json().catch(() => null);
+    let message: any = err?.detail ?? err?.message ?? res.statusText;
+    if (Array.isArray(message)) {
+      message = message
+        .map((e: any) => {
+          if (e.loc) return `${e.loc.join(".")}: ${e.msg || JSON.stringify(e)}`;
+          return e.msg || JSON.stringify(e);
+        })
+        .join("; ");
+    }
+    throw new Error(typeof message === "string" ? message : JSON.stringify(message));
   }
   return res.json();
 }

@@ -5,7 +5,7 @@ from pydantic_settings import BaseSettings
 from typing import Optional
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 class Settings(BaseSettings):

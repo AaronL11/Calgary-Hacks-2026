@@ -11,13 +11,19 @@ router: APIRouter = APIRouter(prefix="/auth", tags=["Authentication"])
 @router.post("/register")
 async def register(user: UserRegister) -> Dict[str, str]:
 
-    # Check if username exists: 
+    # Check if username exists:
     existing_user: Union[Dict[str, Any], None] = await user_collection.find_one(
         {"username": user.username}
     )
 
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists")
+
+    # Check if email already exists
+    if hasattr(user, "email") and user.email:
+        existing_email = await user_collection.find_one({"email": user.email})
+        if existing_email:
+            raise HTTPException(status_code=400, detail="Email already registered")
 
     # Hash the password
     hashed_pw: bytes = hash_password(user.password)
@@ -26,6 +32,7 @@ async def register(user: UserRegister) -> Dict[str, str]:
     new_user: Dict[str, Any] = {
         "username": user.username,
         "password": hashed_pw,
+        "email": getattr(user, "email", None),
     }
 
     # Insert into MongoDB

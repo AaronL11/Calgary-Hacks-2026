@@ -34,6 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   async function register(username: string, email: string, password: string) {
+    console.log("AuthContext.register called", { username, email, passwordLen: password.length });
     await postRegister({ username, email, password });
     // After successful registration, auto-login
     await login(username, password);

@@ -3,13 +3,32 @@ from ..models import schemas
 from ..services import auth as auth_service
 from fastapi import status
 from bson import ObjectId
+import logging
+from pydantic import ValidationError
+
+logger = logging.getLogger("uvicorn.error")
 
 router = APIRouter()
 
 
 @router.post("/register", response_model=schemas.UserData)
-async def register(user_in: schemas.UserAccount, request: Request):
+async def register(request: Request):
+    # Read raw body to aid debugging validation errors
     db = request.app.state.db
+    try:
+        body = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+
+    # Log at INFO so it's visible in typical server logs
+    logger.info("Register body received: %s", body)
+
+    try:
+        user_in = schemas.UserAccount.model_validate(body)
+    except ValidationError as ve:
+        logger.warning("User registration validation failed: %s", ve)
+        # Return FastAPI-style 422 detail for consistency
+        raise HTTPException(status_code=422, detail=ve.errors())
     # uniqueness checks
     if await db.users.find_one({"username": user_in.username}):
         raise HTTPException(status_code=400, detail="username already exists")
@@ -22,8 +41,6 @@ async def register(user_in: schemas.UserAccount, request: Request):
         "username": user_in.username,
         "email": user_in.email,
         "passwordHash": hashed,
-        "degree": user_in.degree,
-        "yearOfStudy": user_in.yearOfStudy,
         "contributionCount": 0,
         "reputation": 0,
         "joinedAt": now,

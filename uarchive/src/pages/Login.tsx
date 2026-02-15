@@ -11,6 +11,8 @@ export default function Login() {
   const [regEmail, setRegEmail] = useState("");
   const [regUsername, setRegUsername] = useState("");
   const [regPassword, setRegPassword] = useState("");
+  const [regLoading, setRegLoading] = useState(false);
+  const [regSuccess, setRegSuccess] = useState<string | null>(null);
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -163,20 +165,40 @@ export default function Login() {
 
                 <button
                   type="button"
+                  disabled={regLoading}
                   onClick={async () => {
                     setError(null);
+                    setRegSuccess(null);
+                    if (regPassword.length < 6) {
+                      setError("Password must be at least 6 characters");
+                      return;
+                    }
+                    if (regUsername.length < 3) {
+                      setError("Username must be at least 3 characters");
+                      return;
+                    }
+                    console.log("Register clicked", { username: regUsername, email: regEmail, passwordLen: regPassword.length });
+                    setRegLoading(true);
                     try {
                       await auth.register(regUsername, regEmail, regPassword);
-                      setIsRegistering(false);
-                      navigate("/");
+                      setRegSuccess("Registration successful - logging you in...");
+                      // brief pause so user sees success message
+                      setTimeout(() => {
+                        setIsRegistering(false);
+                        navigate("/");
+                      }, 800);
                     } catch (err: any) {
                       setError(err?.message || "Registration failed");
+                    } finally {
+                      setRegLoading(false);
                     }
                   }}
-                  className="w-full rounded-xl bg-uofc-red px-4 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
+                  className="w-full rounded-xl bg-uofc-red px-4 py-3 text-sm font-medium text-white hover:bg-uofc-darkred disabled:opacity-60"
                 >
-                  Register
+                  {regLoading ? "Registering..." : "Register"}
                 </button>
+
+                {regSuccess && <div className="mt-3 text-sm text-green-600">{regSuccess}</div>}
             </form>
 
             <div className="mt-6 text-center">

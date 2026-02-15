@@ -3,7 +3,8 @@ uvicorn[standard]
 motor
 python-dotenv
 python-jose
-passlib[bcrypt]
+passlib[argon2]
+argon2-cffi
 pydantic[email]
 pydantic-settings
 uvloop; sys_platform != "win32"

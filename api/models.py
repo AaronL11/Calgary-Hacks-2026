@@ -1,11 +1,12 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 from datetime import datetime
 
-# USER MODELS: 
+# USER MODELS:
 class UserRegister(BaseModel):
     username: str = Field(..., min_length=2)
-    password: str = Field(..., min_length=8)
+    email: EmailStr
+    password: str = Field(..., min_length=6)
 
 class UserLogin(BaseModel):
     username: str
@@ -15,7 +16,7 @@ class SetPreferencesRequest(BaseModel):
     preferences: List[str]  # ["CPSC", "BIOL", "CHEM"]
 
 
-# COURSE MODELS: 
+# COURSE MODELS:
 class CourseCreateRequest(BaseModel):
     code: str = Field(..., min_length=4, max_length=4)      # BIOL
     number: str = Field(..., min_length=3, max_length=3)    # 315
