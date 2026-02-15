@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Presentation files
+PRESENTATION_OUTLINE.md
+
+DATABASE_SCHEMA.md
