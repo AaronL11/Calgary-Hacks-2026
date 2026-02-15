@@ -5,7 +5,7 @@
 # TODO List:
 
 - [x] Find framework (React)
-- [ ] Establish Roles
+- [x] Establish Roles
 - [ ] Setup Backend
   - [ ] Webserver
   - [ ] Deployment
@@ -14,14 +14,14 @@
     - [ ] Language
   - [ ] Login & Registration
 - [ ] Establish Frontend
-  - [ ] Colour Theme
-  - [ ] Posts
-    - [ ] Course (Name and Code)
-    - [ ] Prof Name
-    - [ ] Difficulty
-    - [ ] Problem Statement
-    - [ ] Votecounts
-    - [ ] Comments
+  - [x] Colour Theme
+  - [x] Posts
+    - [x] Course (Name and Code)
+    - [x] Prof Name
+    - [x] Difficulty
+    - [x] Problem Statement
+    - [x] Votecounts
+    - [x] Comments
       - [ ] Ability to Star
     - [ ] AI Gen Answer Suggestion
 - [ ] Video Ad
