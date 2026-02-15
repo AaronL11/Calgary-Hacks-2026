@@ -8,6 +8,9 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [regEmail, setRegEmail] = useState("");
+  const [regUsername, setRegUsername] = useState("");
+  const [regPassword, setRegPassword] = useState("");
   const auth = useAuth();
   const navigate = useNavigate();
 
@@ -123,6 +126,8 @@ export default function Login() {
                 <input
                   id="reg-email"
                   type="email"
+                  value={regEmail}
+                  onChange={(e) => setRegEmail(e.target.value)}
                   placeholder="Enter your email"
                   className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
@@ -135,6 +140,8 @@ export default function Login() {
                 <input
                   id="reg-username"
                   type="text"
+                  value={regUsername}
+                  onChange={(e) => setRegUsername(e.target.value)}
                   placeholder="Choose a username"
                   className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
@@ -147,18 +154,29 @@ export default function Login() {
                 <input
                   id="reg-password"
                   type="password"
+                  value={regPassword}
+                  onChange={(e) => setRegPassword(e.target.value)}
                   placeholder="Create a password"
                   className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 />
               </div>
 
-              <button
-                type="button"
-                onClick={() => setIsEditingProfile(true)}
-                className="w-full rounded-xl bg-uofc-red px-4 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
-              >
-                Register
-              </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setError(null);
+                    try {
+                      await auth.register(regUsername, regEmail, regPassword);
+                      setIsRegistering(false);
+                      navigate("/");
+                    } catch (err: any) {
+                      setError(err?.message || "Registration failed");
+                    }
+                  }}
+                  className="w-full rounded-xl bg-uofc-red px-4 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
+                >
+                  Register
+                </button>
             </form>
 
             <div className="mt-6 text-center">

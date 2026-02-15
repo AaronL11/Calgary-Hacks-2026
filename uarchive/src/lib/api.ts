@@ -5,6 +5,12 @@ type LoginRequest = {
   password: string;
 };
 
+type RegisterRequest = {
+  username: string;
+  email: string;
+  password: string;
+};
+
 export async function postLogin(data: LoginRequest) {
   const res = await fetch(`${API_BASE}/api/auth/login`, {
     method: "POST",
@@ -14,6 +20,19 @@ export async function postLogin(data: LoginRequest) {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error(err.detail || "Login failed");
+  }
+  return res.json();
+}
+
+export async function postRegister(data: RegisterRequest) {
+  const res = await fetch(`${API_BASE}/api/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || "Registration failed");
   }
   return res.json();
 }

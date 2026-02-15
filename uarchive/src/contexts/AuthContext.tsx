@@ -1,10 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { postLogin, setAuthToken, getAuthToken } from "../lib/api";
+import { postLogin, postRegister, setAuthToken, getAuthToken } from "../lib/api";
 import { useNavigate } from "react-router-dom";
 
 type AuthContextType = {
   token: string | null;
   login: (username: string, password: string) => Promise<void>;
+  register: (username: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   isAuthenticated: boolean;
 };
@@ -32,6 +33,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  async function register(username: string, email: string, password: string) {
+    await postRegister({ username, email, password });
+    // After successful registration, auto-login
+    await login(username, password);
+  }
+
   function logout() {
     setToken(null);
     navigate("/");
@@ -40,6 +47,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextType = {
     token,
     login,
+    register,
     logout,
     isAuthenticated: !!token,
   };
