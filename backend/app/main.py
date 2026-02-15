@@ -20,7 +20,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 
 from .database import connect, close, init_db
-from .routers import auth, users, courses, problems, responses, search
+from .routers import auth, users, courses, problems, responses, search, summaries
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
@@ -129,6 +129,7 @@ def build_app() -> FastAPI:
     app.include_router(courses.router, prefix="/api/courses", tags=["courses"])
     app.include_router(problems.router, prefix="/api/problems", tags=["problems"])
     app.include_router(responses.router, prefix="/api/responses", tags=["responses"])
+    app.include_router(summaries.router, prefix="/api/summaries", tags=["summaries"])
     app.include_router(search.router, prefix="/api/search", tags=["search"])
 
     @app.get("/healthz", tags=["health"])

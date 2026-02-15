@@ -85,3 +85,15 @@ class ProblemCreate(BaseModel):
 class ResponseCreate(BaseModel):
     problemId: str
     content: str
+
+
+class SummaryCreate(BaseModel):
+    courseId: str
+    title: str
+    content: str
+    tags: Optional[List[str]] = []
+    topic: Optional[str] = None
+    professor: Optional[str] = None
+    difficulty: Optional[int] = None
+    semester: Optional[str] = None
+    year: Optional[int] = None

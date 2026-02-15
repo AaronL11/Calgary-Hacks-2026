@@ -87,7 +87,16 @@ export async function createProblem(data: ProblemCreateRequest) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => null);
-    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+    let message: any = err?.detail ?? err?.message ?? res.statusText;
+    if (Array.isArray(message)) {
+      message = message
+        .map((e: any) => {
+          if (e.loc) return `${e.loc.join(".")}: ${e.msg || JSON.stringify(e)}`;
+          return e.msg || JSON.stringify(e);
+        })
+        .join("; ");
+    }
+    throw new Error(typeof message === "string" ? message : JSON.stringify(message));
   }
   return res.json();
 }
@@ -110,6 +119,43 @@ export async function listCourses(): Promise<CourseSummary[]> {
   if (!res.ok) {
     const err = await res.json().catch(() => null);
     throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export type SummaryCreateRequest = {
+  courseId: string;
+  title: string;
+  content: string;
+  tags?: string[];
+  topic?: string;
+  professor?: string;
+  difficulty?: number;
+  semester?: string;
+  year?: number;
+};
+
+export async function createSummary(data: SummaryCreateRequest) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/summaries`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    let message: any = err?.detail ?? err?.message ?? res.statusText;
+    if (Array.isArray(message)) {
+      message = message
+        .map((e: any) => {
+          if (e.loc) return `${e.loc.join(".")}: ${e.msg || JSON.stringify(e)}`;
+          return e.msg || JSON.stringify(e);
+        })
+        .join("; ");
+    }
+    throw new Error(typeof message === "string" ? message : JSON.stringify(message));
   }
   return res.json();
 }

@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import Header from "../components/Header";
 import { useEffect, useState } from "react";
-import { createProblem, listCourses } from "../lib/api";
+import { createProblem, listCourses, createSummary } from "../lib/api";
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
@@ -55,7 +55,19 @@ export default function Post() {
           // optionally navigate to created problem page
           console.log("created problem", created);
         } else {
-          alert("Course summary submission is not implemented yet.");
+          const payload = {
+            courseId: courseId,
+            title,
+            content: description,
+            tags: tags ? tags.split(",").map((t) => t.trim()).filter(Boolean) : [],
+            professor: professor || undefined,
+            difficulty: difficulty || undefined,
+            semester: semester || undefined,
+            year: year || undefined,
+          };
+          const created = await createSummary(payload);
+          alert("Summary submitted successfully.");
+          console.log("created summary", created);
         }
       } catch (err: any) {
         console.error(err);
