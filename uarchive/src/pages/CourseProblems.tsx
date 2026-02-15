@@ -295,8 +295,8 @@ export default function CourseProblems() {
             <div>
               <h2 className="text-2xl font-bold">Problems & Takeaways</h2>
               <p className="mt-1 text-sm text-neutral-600">
-                {problems.length} {problems.length === 1 ? "problem" : "problems"}{" "}
-                found
+                {problems.length}{" "}
+                {problems.length === 1 ? "problem" : "problems"} found
               </p>
             </div>
 

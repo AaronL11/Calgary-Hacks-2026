@@ -15,7 +15,9 @@ export default function Post() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
-  const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">("Medium");
+  const [difficulty, setDifficulty] = useState<"Easy" | "Medium" | "Hard">(
+    "Medium",
+  );
   const [examType, setExamType] = useState("");
   const [semester, setSemester] = useState("Fall");
   const [year, setYear] = useState(2026);
@@ -27,11 +29,11 @@ export default function Post() {
       courseCode,
       title,
       description,
-      tags: tags.split(",").map(t => t.trim()),
+      tags: tags.split(",").map((t) => t.trim()),
       difficulty,
       examType,
       semester,
-      year
+      year,
     });
   };
 
@@ -41,13 +43,20 @@ export default function Post() {
         <div className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
           <Link to="/" className="flex items-center gap-3">
             <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">UArchive</div>
-              <div className="text-xs text-neutral-600">Integrity-first course memory bank</div>
+              <div className="text-sm font-semibold tracking-tight">
+                UArchive
+              </div>
+              <div className="text-xs text-neutral-600">
+                Integrity-first course memory bank
+              </div>
             </div>
           </Link>
 
           <nav className="flex items-center gap-2 text-sm">
-            <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100" to="/courses">
+            <Link
+              className="rounded-lg px-3 py-2 hover:bg-neutral-100"
+              to="/courses"
+            >
               Browse
             </Link>
             <Link
@@ -74,7 +83,10 @@ export default function Post() {
           <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Course Code */}
             <div>
-              <label htmlFor="courseCode" className="block text-sm font-medium text-neutral-900 mb-2">
+              <label
+                htmlFor="courseCode"
+                className="block text-sm font-medium text-neutral-900 mb-2"
+              >
                 Course Code *
               </label>
               <select
@@ -95,7 +107,10 @@ export default function Post() {
 
             {/* Title */}
             <div>
-              <label htmlFor="title" className="block text-sm font-medium text-neutral-900 mb-2">
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-neutral-900 mb-2"
+              >
                 Problem Title *
               </label>
               <input
@@ -111,7 +126,10 @@ export default function Post() {
 
             {/* Description */}
             <div>
-              <label htmlFor="description" className="block text-sm font-medium text-neutral-900 mb-2">
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-neutral-900 mb-2"
+              >
                 Description *
               </label>
               <textarea
@@ -128,7 +146,10 @@ export default function Post() {
             {/* Exam Type and Term */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="examType" className="block text-sm font-medium text-neutral-900 mb-2">
+                <label
+                  htmlFor="examType"
+                  className="block text-sm font-medium text-neutral-900 mb-2"
+                >
                   Exam Type *
                 </label>
                 <input
@@ -143,7 +164,10 @@ export default function Post() {
               </div>
 
               <div>
-                <label htmlFor="semester" className="block text-sm font-medium text-neutral-900 mb-2">
+                <label
+                  htmlFor="semester"
+                  className="block text-sm font-medium text-neutral-900 mb-2"
+                >
                   Semester *
                 </label>
                 <select
@@ -164,7 +188,10 @@ export default function Post() {
             {/* Year and Difficulty */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="year" className="block text-sm font-medium text-neutral-900 mb-2">
+                <label
+                  htmlFor="year"
+                  className="block text-sm font-medium text-neutral-900 mb-2"
+                >
                   Year *
                 </label>
                 <input
@@ -180,13 +207,18 @@ export default function Post() {
               </div>
 
               <div>
-                <label htmlFor="difficulty" className="block text-sm font-medium text-neutral-900 mb-2">
+                <label
+                  htmlFor="difficulty"
+                  className="block text-sm font-medium text-neutral-900 mb-2"
+                >
                   Difficulty *
                 </label>
                 <select
                   id="difficulty"
                   value={difficulty}
-                  onChange={(e) => setDifficulty(e.target.value as "Easy" | "Medium" | "Hard")}
+                  onChange={(e) =>
+                    setDifficulty(e.target.value as "Easy" | "Medium" | "Hard")
+                  }
                   required
                   className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
                 >
@@ -199,7 +231,10 @@ export default function Post() {
 
             {/* Tags */}
             <div>
-              <label htmlFor="tags" className="block text-sm font-medium text-neutral-900 mb-2">
+              <label
+                htmlFor="tags"
+                className="block text-sm font-medium text-neutral-900 mb-2"
+              >
                 Tags
               </label>
               <input
@@ -210,7 +245,9 @@ export default function Post() {
                 placeholder="e.g., DP, Graphs, Proofs (comma-separated)"
                 className="w-full rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm outline-none focus:border-uofc-red focus:ring-2 focus:ring-uofc-red/20"
               />
-              <p className="mt-1 text-xs text-neutral-500">Separate tags with commas</p>
+              <p className="mt-1 text-xs text-neutral-500">
+                Separate tags with commas
+              </p>
             </div>
 
             {/* Submit Buttons */}
@@ -244,7 +281,8 @@ export default function Post() {
 
       <footer className="border-t border-neutral-200 bg-white mt-12">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-neutral-600">
-          UArchive is built for integrity-first pattern learning. No copyrighted exam uploads.
+          UArchive is built for integrity-first pattern learning. No copyrighted
+          exam uploads.
         </div>
       </footer>
     </main>

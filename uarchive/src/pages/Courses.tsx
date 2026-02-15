@@ -46,13 +46,20 @@ export default function Courses() {
         <div className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
           <Link to="/" className="flex items-center gap-3">
             <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">UArchive</div>
-              <div className="text-xs text-neutral-600">Integrity-first course memory bank</div>
+              <div className="text-sm font-semibold tracking-tight">
+                UArchive
+              </div>
+              <div className="text-xs text-neutral-600">
+                Integrity-first course memory bank
+              </div>
             </div>
           </Link>
 
           <nav className="flex items-center gap-2 text-sm">
-            <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100" to="/courses">
+            <Link
+              className="rounded-lg px-3 py-2 hover:bg-neutral-100"
+              to="/courses"
+            >
               Browse
             </Link>
             <Link
@@ -84,7 +91,8 @@ export default function Courses() {
 
       <footer className="border-t border-neutral-200 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-neutral-600">
-          UArchive is built for integrity-first pattern learning. No copyrighted exam uploads.
+          UArchive is built for integrity-first pattern learning. No copyrighted
+          exam uploads.
         </div>
       </footer>
     </main>
