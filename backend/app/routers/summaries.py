@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, HTTPException, Depends
 from ..models import schemas
 from .users import get_current_user
+from typing import List
 
 router = APIRouter()
 
@@ -9,7 +10,7 @@ def _objid(id_str: str):
     return __import__("bson").ObjectId(id_str)
 
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=schemas.SummaryOut)
 async def create_summary(payload: schemas.SummaryCreate, request: Request, current_user: dict = Depends(get_current_user)):
     db = request.app.state.db
     now = __import__("datetime").datetime.utcnow()
@@ -39,27 +40,13 @@ async def create_summary(payload: schemas.SummaryCreate, request: Request, curre
     })
     res = await db.summaries.insert_one(doc)
     created = await db.summaries.find_one({"_id": res.inserted_id})
-    # stringify ObjectId fields
     try:
-        if created.get("_id") is not None:
-            created["_id"] = str(created.get("_id"))
+        return schemas.SummaryOut.parse_obj(created)
     except Exception:
-        pass
-    try:
-        if created.get("courseId") is not None:
-            created["courseId"] = str(created.get("courseId"))
-    except Exception:
-        pass
-    try:
-        if created.get("authorId") is not None:
-            created["authorId"] = str(created.get("authorId"))
-    except Exception:
-        pass
-
-    return created
+        return created
 
 
-@router.get("")
+@router.get("", response_model=List[schemas.SummaryOut])
 async def list_summaries(request: Request, courseId: str = None, courseCode: str = None):
     db = request.app.state.db
     q = {}
@@ -77,16 +64,8 @@ async def list_summaries(request: Request, courseId: str = None, courseCode: str
     cur = db.summaries.find(q).sort([("createdAt", -1)])
     items = []
     async for doc in cur:
-        # stringify ObjectId fields
         try:
-            if doc.get("_id") is not None:
-                doc["_id"] = str(doc.get("_id"))
+            items.append(schemas.SummaryOut.parse_obj(doc))
         except Exception:
-            pass
-        try:
-            if doc.get("courseId") is not None:
-                doc["courseId"] = str(doc.get("courseId"))
-        except Exception:
-            pass
-        items.append(doc)
+            items.append(doc)
     return items

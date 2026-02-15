@@ -97,3 +97,79 @@ class SummaryCreate(BaseModel):
     difficulty: Optional[int] = None
     semester: Optional[str] = None
     year: Optional[int] = None
+
+
+class CourseOut(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    courseCode: Optional[str] = None
+    courseName: Optional[str] = None
+    department: Optional[str] = None
+    professor: Optional[str] = None
+    semester: Optional[str] = None
+    year: Optional[int] = None
+    tags: Optional[List[str]] = []
+    description: Optional[str] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
+
+
+class ProblemOut(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    courseId: Optional[PyObjectId] = None
+    courseCode: Optional[str] = None
+    title: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = []
+    difficulty: Optional[str] = None
+    examType: Optional[str] = None
+    authorId: Optional[PyObjectId] = None
+    authorUsername: Optional[str] = None
+    votes: Optional[int] = 0
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
+
+
+class SummaryOut(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    courseId: Optional[PyObjectId] = None
+    courseCode: Optional[str] = None
+    title: Optional[str] = None
+    content: Optional[str] = None
+    tags: Optional[List[str]] = []
+    topic: Optional[str] = None
+    professor: Optional[str] = None
+    difficulty: Optional[int] = None
+    semester: Optional[str] = None
+    year: Optional[int] = None
+    authorId: Optional[PyObjectId] = None
+    authorUsername: Optional[str] = None
+    votes: Optional[int] = 0
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
+
+
+class ResponseOut(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    problemId: Optional[PyObjectId] = None
+    content: Optional[str] = None
+    authorId: Optional[PyObjectId] = None
+    authorUsername: Optional[str] = None
+    upvotes: Optional[int] = 0
+    downvotes: Optional[int] = 0
+    isAccepted: Optional[bool] = False
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
