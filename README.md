@@ -4,7 +4,7 @@
 
 UArchive allows students to post content summaries of courses they have taken, as well as post practice problems and warnings of potential unexpected pitfalls for the courses they have taken. By doing this, it takes information that was previously only passed by word-of-mouth and makes it accessible to all, preserving it for years to come. 
 
-To develop this system we used Vite (React) for the front end, and a MongoDB database controlled by a fastapi backend.
+To develop this system we used Vite (React) for the front end, and a MongoDB database controlled by a Fastapi backend.
 
 ## Pages Overview
 Login Page: You can reach the login page from any other using the login button at the top right. Here you can login or register an account. This is required to post anything. 
