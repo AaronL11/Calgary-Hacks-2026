@@ -1,5 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { MOCK_PROBLEMS, MOCK_RESPONSES, MOCK_COURSES, type Problem, type Response } from "../data/mockData";
+import Header from "../components/Header";
 import { useState } from "react";
 
 function TagPill({ text }: { text: string }) {
@@ -25,7 +26,7 @@ function ResponseCard({ response }: { response: Response }) {
       // Change or new vote
       if (userVote === "up") setUpvotes(upvotes - 1);
       if (userVote === "down") setDownvotes(downvotes - 1);
-      
+
       if (type === "up") setUpvotes(upvotes + 1);
       else setDownvotes(downvotes + 1);
       setUserVote(type);
@@ -116,12 +117,12 @@ export default function ProblemDetail() {
 
   // Find the problem
   const problem = MOCK_PROBLEMS.find(p => p._id === problemId);
-  
+
   // Initialize problem votes
   if (problem && problemVotes === 0) {
     setProblemVotes(problem.votes);
   }
-  
+
   const handleProblemVote = (type: "up" | "down") => {
     if (userProblemVote === type) {
       // Unvote
@@ -132,24 +133,24 @@ export default function ProblemDetail() {
       // Change or new vote
       if (userProblemVote === "up") setProblemVotes(problemVotes - 1);
       if (userProblemVote === "down") setProblemVotes(problemVotes + 1);
-      
+
       if (type === "up") setProblemVotes(problemVotes + 1);
       else setProblemVotes(problemVotes - 1);
       setUserProblemVote(type);
     }
   };
-  
+
   // Find the course
   const course = problem ? MOCK_COURSES.find(c => c._id === problem.courseId) : null;
-  
+
   // Find responses
   let responses = MOCK_RESPONSES.filter(r => r.problemId === problemId);
-  
+
   // Sort responses
   responses = [...responses].sort((a, b) => {
     if (a.isAccepted) return -1;
     if (b.isAccepted) return 1;
-    
+
     if (sortBy === "votes") {
       return (b.upvotes - b.downvotes) - (a.upvotes - a.downvotes);
     } else {
@@ -160,28 +161,7 @@ export default function ProblemDetail() {
   if (!problem) {
     return (
       <main className="min-h-screen bg-neutral-50 text-neutral-900">
-        <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
-            <Link to="/" className="flex items-center gap-3">
-              <div className="leading-tight">
-                <div className="text-sm font-semibold tracking-tight">UArchive</div>
-                <div className="text-xs text-neutral-600">Integrity-first course memory bank</div>
-              </div>
-            </Link>
-            <nav className="flex items-center gap-2 text-sm">
-              <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100" to="/courses">
-                Browse
-              </Link>
-              <Link
-                className="rounded-lg bg-uofc-red px-3 py-2 font-medium text-white hover:bg-uofc-darkred"
-                to="/login"
-              >
-                Login
-              </Link>
-            </nav>
-          </div>
-        </header>
-        <div className="h-2 w-full bg-uofc-red" />
+        <Header />
         <div className="mx-auto max-w-4xl px-4 py-12">
           <p className="text-neutral-600">Problem not found</p>
           <Link to="/" className="mt-4 inline-block text-sm text-uofc-red hover:underline">
@@ -194,41 +174,18 @@ export default function ProblemDetail() {
 
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
-      <header className="sticky top-0 z-20 border-b border-neutral-200 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
-          <Link to="/" className="flex items-center gap-3">
-            <div className="leading-tight">
-              <div className="text-sm font-semibold tracking-tight">UArchive</div>
-              <div className="text-xs text-neutral-600">Integrity-first course memory bank</div>
-            </div>
-          </Link>
-
-          <nav className="flex items-center gap-2 text-sm">
-            <Link className="rounded-lg px-3 py-2 hover:bg-neutral-100" to="/courses">
-              Browse
-            </Link>
-            <Link
-              className="rounded-lg bg-uofc-red px-3 py-2 font-medium text-white hover:bg-uofc-darkred"
-              to="/login"
-            >
-              Login
-            </Link>
-          </nav>
-        </div>
-      </header>
-
-      <div className="h-2 w-full bg-uofc-red" />
+        <Header />
 
       {/* Problem Header */}
       <section className="border-b border-neutral-200 bg-white">
         <div className="mx-auto max-w-4xl px-4 py-8">
-          <Link 
+          <Link
             to={`/course?code=${encodeURIComponent(problem.courseCode)}`}
             className="inline-flex items-center gap-1 text-sm text-neutral-600 hover:text-neutral-900"
           >
             ← Back to {problem.courseCode}
           </Link>
-          
+
           <div className="mt-4">
             <div className="flex items-start gap-6">
               {/* Voting column for problem */}
@@ -246,8 +203,8 @@ export default function ProblemDetail() {
                   </svg>
                 </button>
                 <span className={`text-lg font-bold ${
-                  problemVotes > (problem?.votes || 0) ? "text-green-600" : 
-                  problemVotes < (problem?.votes || 0) ? "text-red-600" : 
+                  problemVotes > (problem?.votes || 0) ? "text-green-600" :
+                  problemVotes < (problem?.votes || 0) ? "text-red-600" :
                   "text-neutral-900"
                 }`}>
                   {problemVotes}
@@ -275,9 +232,9 @@ export default function ProblemDetail() {
                     </span>
                   )}
                 </div>
-                
+
                 <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-neutral-600">
-                  <Link 
+                  <Link
                     to={`/course?code=${encodeURIComponent(problem.courseCode)}`}
                     className="font-medium text-uofc-red hover:underline"
                   >
