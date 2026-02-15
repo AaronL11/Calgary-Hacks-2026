@@ -68,7 +68,7 @@ export default function Home() {
             Browse Courses
           </Link>
           <Link
-            to="/login"
+            to="/post"
             className="rounded-xl border border-neutral-300 bg-white px-5 py-3 text-sm font-medium hover:bg-neutral-100"
           >
             Add a Problem
@@ -184,7 +184,7 @@ export default function Home() {
                 <p className="mt-3 text-sm text-neutral-700">{s.takeaway}</p>
 
                 <div className="mt-4 flex gap-2">
-                  <Link to="/login" className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-100">Add your reflection</Link>
+                  <Link to="/post" className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-100">Add your reflection</Link>
                   <Link to="/courses" className="rounded-xl bg-neutral-900 px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800">Browse more</Link>
                 </div>
               </div>

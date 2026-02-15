@@ -210,6 +210,22 @@ export const MOCK_COURSES: Course[] = [
     problemCount: 234,
     createdAt: "2025-01-05T00:00:00Z",
     updatedAt: "2026-02-01T10:15:00Z"
+  },
+  {
+    _id: "course_009",
+    courseCode: "CPSC 331",
+    courseName: "Data Structures & Algorithms",
+    department: "Computer Science",
+    professor: "Dr. Jennifer Lee",
+    semester: "Fall",
+    year: 2025,
+    tags: ["Data Structures", "Sorting", "Trees", "Graphs"],
+    description: "Fundamental data structures and algorithmic techniques",
+    difficulty: 6,
+    enrollmentCount: 420,
+    problemCount: 189,
+    createdAt: "2024-09-01T00:00:00Z",
+    updatedAt: "2025-12-20T09:15:00Z"
   }
 ];
 

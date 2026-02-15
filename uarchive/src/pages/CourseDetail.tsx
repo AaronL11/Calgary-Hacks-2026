@@ -283,7 +283,7 @@ export default function CourseDetail() {
                 </Link>
 
                 <Link
-                  to="/login"
+                  to="/post"
                   className="mt-2 block w-full rounded-lg border border-uofc-red bg-white px-4 py-2 text-sm font-medium text-uofc-red hover:bg-red-50 transition-colors"
                 >
                   Contribute
@@ -321,7 +321,7 @@ export default function CourseDetail() {
                 No summaries yet for this course.
               </p>
               <Link
-                to="/login"
+                to="/post"
                 className="mt-4 inline-block rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
               >
                 Be the first to contribute
