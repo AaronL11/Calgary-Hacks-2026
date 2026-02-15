@@ -3,7 +3,7 @@ import { type Problem, type Response, type Course, type Comment } from "../data/
 import Header from "../components/Header";
 import { useState, useEffect } from "react";
 import MarkdownRenderer from "../components/MarkdownRenderer";
-import { getProblem, listResponses, listCourses, listComments, createComment, createResponse } from "../lib/api";
+import { getProblem, listResponses, listCourses, listComments, createComment, createResponse, voteResponse, voteComment, voteProblem } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
 
 function TagPill({ text }: { text: string }) {
@@ -198,20 +198,44 @@ export default function ProblemDetail() {
   }, [problemId]);
 
   const handleProblemVote = (type: "up" | "down") => {
-    if (userProblemVote === type) {
-      // Unvote
-      if (type === "up") setProblemVotes(problemVotes - 1);
-      else setProblemVotes(problemVotes + 1);
+    if (!problem) return;
+
+    const prevVotes = problemVotes;
+    const prevUserVote = userProblemVote;
+
+    // determine server delta (handles new vote, unvote, and switching vote)
+    let serverDelta = 0;
+    if (prevUserVote === type) {
+      // unvote
+      serverDelta = type === "up" ? -1 : 1;
+    } else if (prevUserVote == null) {
+      serverDelta = type === "up" ? 1 : -1;
+    } else {
+      // switching vote (remove previous and add new)
+      if (prevUserVote === "up" && type === "down") serverDelta = -2;
+      if (prevUserVote === "down" && type === "up") serverDelta = 2;
+    }
+
+    // optimistic UI update
+    if (prevUserVote === type) {
+      if (type === "up") setProblemVotes((v) => v - 1);
+      else setProblemVotes((v) => v + 1);
       setUserProblemVote(null);
     } else {
-      // Change or new vote
-      if (userProblemVote === "up") setProblemVotes(problemVotes - 1);
-      if (userProblemVote === "down") setProblemVotes(problemVotes + 1);
+      if (prevUserVote === "up") setProblemVotes((v) => v - 1);
+      if (prevUserVote === "down") setProblemVotes((v) => v + 1);
 
-      if (type === "up") setProblemVotes(problemVotes + 1);
-      else setProblemVotes(problemVotes - 1);
+      if (type === "up") setProblemVotes((v) => v + 1);
+      else setProblemVotes((v) => v - 1);
       setUserProblemVote(type);
     }
+
+    // call backend and revert on error
+    voteProblem(problem._id, serverDelta).catch(() => {
+      // revert to previous state on failure
+      setProblemVotes(prevVotes);
+      setUserProblemVote(prevUserVote);
+    });
   };
 
   // Sort responses
