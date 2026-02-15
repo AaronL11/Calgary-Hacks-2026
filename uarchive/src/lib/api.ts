@@ -197,6 +197,70 @@ export async function createResponse(data: ResponseCreateRequest) {
   return res.json();
 }
 
+export async function voteResponse(responseId: string, delta = 1) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/responses/${encodeURIComponent(responseId)}/vote`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ delta }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export async function voteProblem(problemId: string, delta = 1) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/problems/${encodeURIComponent(problemId)}/vote`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ delta }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export async function voteComment(commentId: string, delta = 1) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/comments/${encodeURIComponent(commentId)}/vote`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ delta }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export async function voteSummary(summaryId: string, delta = 1) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/summaries/${encodeURIComponent(summaryId)}/vote`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ delta }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
 export type SummarySummary = {
   _id?: string;
   courseCode?: string;

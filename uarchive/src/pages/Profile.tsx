@@ -67,6 +67,8 @@ export default function Profile() {
                 <div><strong>Email:</strong> {userData?.email ?? "-"}</div>
                 <div><strong>Degree:</strong> {userData?.degree ?? "-"}</div>
                 <div><strong>Joined:</strong> {userData?.joinedAt ? new Date(userData.joinedAt).toLocaleDateString() : "-"}</div>
+                <div><strong>Contributions:</strong> {userData?.contributionCount ?? 0}</div>
+                <div><strong>Reputation:</strong> {userData?.reputation ?? 0}</div>
               </div>
             )}
 

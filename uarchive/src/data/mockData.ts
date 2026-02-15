@@ -68,6 +68,8 @@ export interface Comment {
   authorId?: string;
   authorUsername?: string;
   content: string;
+  upvotes?: number;
+  downvotes?: number;
   createdAt: string;
   updatedAt?: string;
 }

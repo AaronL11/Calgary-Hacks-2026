@@ -2,7 +2,7 @@ import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import { type Problem, type Response, type Course, type Comment } from "../data/mockData";
 import Header from "../components/Header";
 import { useState, useEffect } from "react";
-import { getProblem, listResponses, listCourses, listComments, createComment, createResponse } from "../lib/api";
+import { getProblem, listResponses, listCourses, listComments, createComment, createResponse, voteResponse, voteComment } from "../lib/api";
 import { useAuth } from "../contexts/AuthContext";
 
 function TagPill({ text }: { text: string }) {
@@ -17,22 +17,18 @@ function ResponseCard({ response }: { response: Response }) {
   const [upvotes, setUpvotes] = useState(response.upvotes);
   const [downvotes, setDownvotes] = useState(response.downvotes);
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
-
   const handleVote = (type: "up" | "down") => {
-    if (userVote === type) {
-      // Unvote
-      if (type === "up") setUpvotes(upvotes - 1);
-      else setDownvotes(downvotes - 1);
+    const delta = type === "up" ? 1 : -1;
+    // optimistic update
+    if (type === "up") setUpvotes((s) => s + 1);
+    else setDownvotes((s) => s + 1);
+    setUserVote(type);
+    voteResponse(response._id, delta).catch(() => {
+      // revert on error
+      if (type === "up") setUpvotes((s) => s - 1);
+      else setDownvotes((s) => s - 1);
       setUserVote(null);
-    } else {
-      // Change or new vote
-      if (userVote === "up") setUpvotes(upvotes - 1);
-      if (userVote === "down") setDownvotes(downvotes - 1);
-
-      if (type === "up") setUpvotes(upvotes + 1);
-      else setDownvotes(downvotes + 1);
-      setUserVote(type);
-    }
+    });
   };
 
   const netVotes = upvotes - downvotes;
@@ -111,6 +107,22 @@ function ResponseCard({ response }: { response: Response }) {
 }
 
 function CommentCard({ comment }: { comment: Comment }) {
+  const [upvotes, setUpvotes] = useState(comment.upvotes || 0);
+  const [downvotes, setDownvotes] = useState(comment.downvotes || 0);
+  const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
+
+  const handleVote = (type: "up" | "down") => {
+    const delta = type === "up" ? 1 : -1;
+    if (type === "up") setUpvotes((s) => s + 1);
+    else setDownvotes((s) => s + 1);
+    setUserVote(type);
+    voteComment(comment._id, delta).catch(() => {
+      if (type === "up") setUpvotes((s) => s - 1);
+      else setDownvotes((s) => s - 1);
+      setUserVote(null);
+    });
+  };
+
   return (
     <Card>
       <div className="p-4">
@@ -118,6 +130,11 @@ function CommentCard({ comment }: { comment: Comment }) {
           <div>
             <div className="text-sm font-medium text-neutral-900">{comment.authorUsername || "Anonymous"}</div>
             <div className="text-xs text-neutral-500">{new Date(comment.createdAt).toLocaleDateString()}</div>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <button onClick={() => handleVote("up")} className={`rounded-lg p-2 ${userVote === "up" ? "bg-green-100 text-green-700" : "hover:bg-neutral-100 text-neutral-600"}`}>▲</button>
+            <div className="text-sm font-semibold">{upvotes - downvotes}</div>
+            <button onClick={() => handleVote("down")} className={`rounded-lg p-2 ${userVote === "down" ? "bg-red-100 text-red-700" : "hover:bg-neutral-100 text-neutral-600"}`}>▼</button>
           </div>
         </div>
         <p className="mt-3 text-sm text-neutral-700 leading-relaxed">{comment.content}</p>

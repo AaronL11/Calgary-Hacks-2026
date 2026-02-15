@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { type Course, type Summary } from "../data/mockData";
-import { listSummaries, listCourses } from "../lib/api";
+import { listSummaries, listCourses, voteSummary } from "../lib/api";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
 
@@ -42,20 +42,15 @@ function SummaryCard({ summary }: { summary: Summary }) {
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
 
   const handleVote = (type: "up" | "down") => {
-    if (userVote === type) {
-      // Unvote
-      if (type === "up") setUpvotes(upvotes - 1);
-      else setDownvotes(downvotes - 1);
+    const delta = type === "up" ? 1 : -1;
+    if (type === "up") setUpvotes((s) => s + 1);
+    else setDownvotes((s) => s + 1);
+    setUserVote(type);
+    voteSummary(summary._id, delta).catch(() => {
+      if (type === "up") setUpvotes((s) => s - 1);
+      else setDownvotes((s) => s - 1);
       setUserVote(null);
-    } else {
-      // Change or new vote
-      if (userVote === "up") setUpvotes(upvotes - 1);
-      if (userVote === "down") setDownvotes(downvotes - 1);
-
-      if (type === "up") setUpvotes(upvotes + 1);
-      else setDownvotes(downvotes + 1);
-      setUserVote(type);
-    }
+    });
   };
 
   const netVotes = upvotes - downvotes;
