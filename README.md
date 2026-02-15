@@ -22,6 +22,7 @@ Problems Page: Here you can see a list of posts relating to a course, including 
 <img width="1521" height="654" alt="image" src="https://github.com/user-attachments/assets/de471d42-6f92-4bbd-a8d4-9ce0061c1fac" />
 
 Problem Page: Here you can see an individual post relating to a course, as well as the comments made in reply to the post. You can also post your own comments here if you are logged in.
+
 <img width="641" height="819" alt="image" src="https://github.com/user-attachments/assets/d42e9877-f518-43fa-88ac-079ffd6f86f8" />
 
 Post Page: From here you can either make a problem post under a given course, or you can post your own summary of a given course's contents.
