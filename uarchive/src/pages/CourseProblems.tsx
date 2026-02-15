@@ -124,7 +124,9 @@ function ProblemCard({ problem }: { problem: Problem }) {
               </span>
             </div>
 
-            <p className="mt-3 text-sm text-neutral-700">{problem.description}</p>
+            <p className="mt-3 text-sm text-neutral-700">
+              {problem.description}
+            </p>
 
             <div className="mt-3 flex flex-wrap gap-2">
               {problem.tags.map((t) => (
@@ -288,16 +290,25 @@ export default function CourseProblems() {
 
       {/* Problems Section */}
       <section className="mx-auto max-w-6xl px-4 py-8">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-bold">Problems & Takeaways</h2>
-            <p className="mt-1 text-sm text-neutral-600">
-              {problems.length} {problems.length === 1 ? "problem" : "problems"}{" "}
-              found
-            </p>
+        <div className="mb-6">
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-2xl font-bold">Problems & Takeaways</h2>
+              <p className="mt-1 text-sm text-neutral-600">
+                {problems.length}{" "}
+                {problems.length === 1 ? "problem" : "problems"} found
+              </p>
+            </div>
+
+            <Link
+              to="/post"
+              className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred transition-colors"
+            >
+              Contribute Problem
+            </Link>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-end gap-3">
             <div className="flex items-center gap-2">
               <label className="text-sm text-neutral-600">Difficulty:</label>
               <select
