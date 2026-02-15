@@ -40,10 +40,82 @@ function DifficultyBadge({ level }: { level: number }) {
 }
 
 function ProblemCard({ problem }: { problem: Problem }) {
+  const [upvotes, setUpvotes] = useState(problem.votes > 0 ? problem.votes : 0);
+  const [downvotes, setDownvotes] = useState(0);
+  const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
+
+  const handleVote = (type: "up" | "down") => {
+    if (userVote === type) {
+      // Unvote
+      if (type === "up") setUpvotes(upvotes - 1);
+      else setDownvotes(downvotes - 1);
+      setUserVote(null);
+    } else {
+      // Change or new vote
+      if (userVote === "up") setUpvotes(upvotes - 1);
+      if (userVote === "down") setDownvotes(downvotes - 1);
+
+      if (type === "up") setUpvotes(upvotes + 1);
+      else setDownvotes(downvotes + 1);
+      setUserVote(type);
+    }
+  };
+
+  const netVotes = upvotes - downvotes;
+
   return (
     <Card>
       <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
+        <div className="flex gap-4">
+          {/* Voting column */}
+          <div className="flex flex-col items-center gap-2">
+            <button
+              onClick={() => handleVote("up")}
+              className={`rounded-lg p-2 transition-colors ${
+                userVote === "up"
+                  ? "bg-green-100 text-green-700"
+                  : "hover:bg-neutral-100 text-neutral-600"
+              }`}
+            >
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            <span
+              className={`text-sm font-semibold ${
+                netVotes > 0
+                  ? "text-green-600"
+                  : netVotes < 0
+                    ? "text-red-600"
+                    : "text-neutral-600"
+              }`}
+            >
+              {netVotes > 0 ? "+" : ""}
+              {netVotes}
+            </span>
+            <button
+              onClick={() => handleVote("down")}
+              className={`rounded-lg p-2 transition-colors ${
+                userVote === "down"
+                  ? "bg-red-100 text-red-700"
+                  : "hover:bg-neutral-100 text-neutral-600"
+              }`}
+            >
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path
+                  fillRule="evenodd"
+                  d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* Content column */}
           <div className="flex-1">
             <h3 className="text-sm font-semibold">{problem.title}</h3>
             <div className="mt-1 flex items-center gap-2 text-xs text-neutral-600">
@@ -51,30 +123,27 @@ function ProblemCard({ problem }: { problem: Problem }) {
                 {problem.semester} {problem.year}
               </span>
             </div>
+
+            <p className="mt-3 text-sm text-neutral-700">{problem.description}</p>
+
+            <div className="mt-3 flex flex-wrap gap-2">
+              {problem.tags.map((t) => (
+                <TagPill key={t} text={t} />
+              ))}
+            </div>
+
+            <div className="mt-4 flex items-center justify-between">
+              <span className="text-xs text-neutral-500">
+                by {problem.authorUsername}
+              </span>
+              <Link
+                to={`/problem?id=${problem._id}`}
+                className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
+              >
+                View Details
+              </Link>
+            </div>
           </div>
-          <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium">
-            ▲ {problem.votes}
-          </div>
-        </div>
-
-        <p className="mt-3 text-sm text-neutral-700">{problem.description}</p>
-
-        <div className="mt-3 flex flex-wrap gap-2">
-          {problem.tags.map((t) => (
-            <TagPill key={t} text={t} />
-          ))}
-        </div>
-
-        <div className="mt-4 flex items-center justify-between">
-          <span className="text-xs text-neutral-500">
-            by {problem.authorUsername}
-          </span>
-          <Link
-            to={`/problem?id=${problem._id}`}
-            className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium hover:bg-neutral-50"
-          >
-            View Details
-          </Link>
         </div>
       </div>
     </Card>
