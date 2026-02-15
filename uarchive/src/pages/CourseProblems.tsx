@@ -3,6 +3,7 @@ import { type Course, type Problem } from "../data/mockData";
 import { listProblems, listCourses } from "../lib/api";
 import { useEffect, useState } from "react";
 import Header from "../components/Header";
+import MarkdownRenderer from "../components/MarkdownRenderer";
 
 function TagPill({ text }: { text: string }) {
   return (
@@ -68,11 +69,10 @@ function ProblemCard({ problem }: { problem: Problem }) {
           <div className="flex flex-col items-center gap-2">
             <button
               onClick={() => handleVote("up")}
-              className={`rounded-lg p-2 transition-colors ${
-                userVote === "up"
+              className={`rounded-lg p-2 transition-colors ${userVote === "up"
                   ? "bg-green-100 text-green-700"
                   : "hover:bg-neutral-100 text-neutral-600"
-              }`}
+                }`}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -83,24 +83,22 @@ function ProblemCard({ problem }: { problem: Problem }) {
               </svg>
             </button>
             <span
-              className={`text-sm font-semibold ${
-                netVotes > 0
+              className={`text-sm font-semibold ${netVotes > 0
                   ? "text-green-600"
                   : netVotes < 0
                     ? "text-red-600"
                     : "text-neutral-600"
-              }`}
+                }`}
             >
               {netVotes > 0 ? "+" : ""}
               {netVotes}
             </span>
             <button
               onClick={() => handleVote("down")}
-              className={`rounded-lg p-2 transition-colors ${
-                userVote === "down"
+              className={`rounded-lg p-2 transition-colors ${userVote === "down"
                   ? "bg-red-100 text-red-700"
                   : "hover:bg-neutral-100 text-neutral-600"
-              }`}
+                }`}
             >
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path
@@ -122,7 +120,7 @@ function ProblemCard({ problem }: { problem: Problem }) {
             </div>
 
             <p className="mt-3 text-sm text-neutral-700">
-              {problem.description}
+              <MarkdownRenderer content={problem.description} />
             </p>
 
             <div className="mt-3 flex flex-wrap gap-2">
@@ -171,14 +169,14 @@ export default function CourseProblems() {
         const found = (courses as Course[]).find((c) => c.courseCode === courseCode);
         setCourse(found ?? null);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     listProblems(courseCode)
       .then((p) => {
         if (!mounted) return;
         setProblems(p as Problem[]);
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => {
       mounted = false;
@@ -222,7 +220,7 @@ export default function CourseProblems() {
 
   return (
     <main className="min-h-screen bg-neutral-50 text-neutral-900">
-        <Header />
+      <Header />
 
       {/* Course Header */}
       <section className="border-b border-neutral-200 bg-white">
