@@ -26,3 +26,5 @@ Problem Page: Here you can see an individual post relating to a course, as well 
 
 Post Page: From here you can either make a problem post under a given course, or you can post your own summary of a given course's contents.
 <img width="1640" height="806" alt="image" src="https://github.com/user-attachments/assets/afbeb1b0-c7ef-449b-a572-c33c9c33a4db" />
+
+(Pictures shown above are old from development process)
