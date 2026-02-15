@@ -99,6 +99,11 @@ class SummaryCreate(BaseModel):
     year: Optional[int] = None
 
 
+class CommentCreate(BaseModel):
+    problemId: str
+    content: str
+
+
 class CourseOut(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     courseCode: Optional[str] = None
@@ -167,6 +172,20 @@ class ResponseOut(BaseModel):
     upvotes: Optional[int] = 0
     downvotes: Optional[int] = 0
     isAccepted: Optional[bool] = False
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
+
+    class Config:
+        json_encoders = {ObjectId: str}
+        allow_population_by_field_name = True
+
+
+class CommentOut(BaseModel):
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    problemId: Optional[PyObjectId] = None
+    content: Optional[str] = None
+    authorId: Optional[PyObjectId] = None
+    authorUsername: Optional[str] = None
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
 
