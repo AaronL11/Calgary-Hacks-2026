@@ -2,6 +2,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { type Course, type Problem } from "../data/mockData";
 import { listProblems, listCourses } from "../lib/api";
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import Header from "../components/Header";
 import MarkdownRenderer from "../components/MarkdownRenderer";
 
@@ -160,6 +161,7 @@ export default function CourseProblems() {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [problems, setProblems] = useState<Problem[]>([]);
+  const auth = useAuth();
 
   useEffect(() => {
     let mounted = true;
@@ -257,12 +259,22 @@ export default function CourseProblems() {
               </p>
             </div>
 
-            <Link
-              to="/post"
-              className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred transition-colors"
-            >
-              Contribute Problem
-            </Link>
+            {/* Render contribute button based on auth state */}
+            {auth.isAuthenticated ? (
+              <Link
+                to="/post"
+                className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred transition-colors"
+              >
+                Contribute Problem
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred transition-colors"
+              >
+                Login to Contribute
+              </Link>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-3">

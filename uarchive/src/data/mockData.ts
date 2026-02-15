@@ -62,6 +62,16 @@ export interface Response {
   updatedAt: string;
 }
 
+export interface Comment {
+  _id: string;
+  problemId: string;
+  authorId?: string;
+  authorUsername?: string;
+  content: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
 export interface Summary {
   _id: string;
   courseId: string;

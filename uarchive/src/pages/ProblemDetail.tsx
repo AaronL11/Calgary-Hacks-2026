@@ -1,8 +1,10 @@
-import { Link, useSearchParams } from "react-router-dom";
-import { MOCK_PROBLEMS, MOCK_RESPONSES, MOCK_COURSES, type Problem, type Response } from "../data/mockData";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
+import { type Problem, type Response, type Course, type Comment } from "../data/mockData";
 import Header from "../components/Header";
 import { useState } from "react";
 import MarkdownRenderer from "../components/MarkdownRenderer";
+import { getProblem, listResponses, listCourses, listComments, createComment, createResponse } from "../lib/api";
+import { useAuth } from "../contexts/AuthContext";
 
 function TagPill({ text }: { text: string }) {
   return <span className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-xs text-neutral-700">{text}</span>;
@@ -106,20 +108,77 @@ function ResponseCard({ response }: { response: Response }) {
   );
 }
 
+function CommentCard({ comment }: { comment: Comment }) {
+  return (
+    <Card>
+      <div className="p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium text-neutral-900">{comment.authorUsername || "Anonymous"}</div>
+            <div className="text-xs text-neutral-500">{new Date(comment.createdAt).toLocaleDateString()}</div>
+          </div>
+        </div>
+        <p className="mt-3 text-sm text-neutral-700 leading-relaxed">{comment.content}</p>
+      </div>
+    </Card>
+  );
+}
+
 export default function ProblemDetail() {
   const [searchParams] = useSearchParams();
   const problemId = searchParams.get("id") || "prob_001";
   const [sortBy, setSortBy] = useState<"votes" | "recent">("votes");
   const [problemVotes, setProblemVotes] = useState<number>(0);
   const [userProblemVote, setUserProblemVote] = useState<"up" | "down" | null>(null);
+  const [problem, setProblem] = useState<Problem | null>(null);
+  const [responses, setResponses] = useState<Response[]>([]);
+  const [showResponseForm, setShowResponseForm] = useState(false);
+  const [newResponse, setNewResponse] = useState("");
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [newComment, setNewComment] = useState("");
+  const [posting, setPosting] = useState(false);
+  const [course, setCourse] = useState<Course | null>(null);
+  const navigate = useNavigate();
+  const auth = useAuth();
 
-  // Find the problem
-  const problem = MOCK_PROBLEMS.find(p => p._id === problemId);
+  useEffect(() => {
+    let mounted = true;
+    getProblem(problemId)
+      .then((p) => {
+        if (!mounted) return;
+        setProblem(p as Problem);
+        setProblemVotes((p as any).votes || 0);
+      })
+      .catch(() => { });
 
-  // Initialize problem votes
-  if (problem && problemVotes === 0) {
-    setProblemVotes(problem.votes);
-  }
+    listResponses(problemId)
+      .then((r) => {
+        if (!mounted) return;
+        setResponses(r as Response[]);
+      })
+      .catch(() => { });
+
+
+    listComments(problemId)
+      .then((c) => {
+        if (!mounted) return;
+        setComments(c as Comment[]);
+      })
+      .catch(() => { });
+
+    // find course info
+    listCourses()
+      .then((courses) => {
+        if (!mounted) return;
+        const found = (courses as Course[]).find((c) => c.courseCode === (problem?.courseCode || ""));
+        if (found) setCourse(found);
+      })
+      .catch(() => { });
+
+    return () => {
+      mounted = false;
+    };
+  }, [problemId]);
 
   const handleProblemVote = (type: "up" | "down") => {
     if (userProblemVote === type) {
@@ -138,14 +197,8 @@ export default function ProblemDetail() {
     }
   };
 
-  // Find the course
-  const course = problem ? MOCK_COURSES.find(c => c._id === problem.courseId) : null;
-
-  // Find responses
-  let responses = MOCK_RESPONSES.filter(r => r.problemId === problemId);
-
   // Sort responses
-  responses = [...responses].sort((a, b) => {
+  const sortedResponses = [...responses].sort((a, b) => {
     if (a.isAccepted) return -1;
     if (b.isAccepted) return 1;
 
@@ -269,7 +322,7 @@ export default function ProblemDetail() {
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold">
-              {responses.length} {responses.length === 1 ? 'Response' : 'Responses'}
+              {sortedResponses.length} {sortedResponses.length === 1 ? 'Response' : 'Responses'}
             </h2>
             <p className="mt-1 text-sm text-neutral-600">
               Student reflections and study tips
@@ -285,30 +338,84 @@ export default function ProblemDetail() {
               <option value="votes">Highest Voted</option>
               <option value="recent">Most Recent</option>
             </select>
-            <Link
-              to="/login"
-              className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
-            >
-              Add Response
-            </Link>
-          </div>
-        </div>
-
-        {responses.length === 0 ? (
-          <Card>
-            <div className="p-12 text-center">
-              <p className="text-neutral-600">No responses yet. Be the first to share your insights!</p>
+            {auth.isAuthenticated ? (
+              <button
+                onClick={() => setShowResponseForm((s) => !s)}
+                className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
+              >
+                {showResponseForm ? 'Cancel' : 'Add Response'}
+              </button>
+            ) : (
               <Link
                 to="/login"
-                className="mt-4 inline-block rounded-lg bg-uofc-red px-6 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
+                className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
               >
                 Add Response
               </Link>
+            )}
+          </div>
+        </div>
+
+        {showResponseForm && auth.isAuthenticated && (
+          <Card>
+            <div className="p-6">
+              <h3 className="font-semibold text-neutral-900">Add a response</h3>
+              <p className="mt-1 text-sm text-neutral-600">Share what you learned, tips for solving similar problems, or common pitfalls to avoid.</p>
+              <textarea
+                value={newResponse}
+                onChange={(e) => setNewResponse(e.target.value)}
+                rows={5}
+                className="mt-4 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none"
+                placeholder="Write your reflection..."
+              />
+              <div className="mt-4 flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    if (!newResponse.trim()) return;
+                    setPosting(true);
+                    createResponse({ problemId, content: newResponse.trim() })
+                      .then((created) => {
+                        setResponses((prev) => [created as Response, ...prev]);
+                        setNewResponse("");
+                        setShowResponseForm(false);
+                      })
+                      .catch((err) => alert(err.message || String(err)))
+                      .finally(() => setPosting(false));
+                  }}
+                  className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
+                >
+                  Post Response
+                </button>
+                <button onClick={() => setShowResponseForm(false)} className="text-sm text-neutral-600">Cancel</button>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {sortedResponses.length === 0 ? (
+          <Card>
+            <div className="p-12 text-center">
+              <p className="text-neutral-600">No responses yet. Be the first to share your insights!</p>
+              {!auth.isAuthenticated ? (
+                <Link
+                  to="/login"
+                  className="mt-4 inline-block rounded-lg bg-uofc-red px-6 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
+                >
+                  Add Response
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setShowResponseForm(true)}
+                  className="mt-4 inline-block rounded-lg bg-uofc-red px-6 py-3 text-sm font-medium text-white hover:bg-uofc-darkred"
+                >
+                  Add Response
+                </button>
+              )}
             </div>
           </Card>
         ) : (
           <div className="space-y-4">
-            {responses.map((response) => (
+            {sortedResponses.map((response) => (
               <ResponseCard key={response._id} response={response} />
             ))}
           </div>
@@ -321,12 +428,89 @@ export default function ProblemDetail() {
             <p className="mt-1 text-sm text-neutral-600">
               Share what you learned, tips for solving similar problems, or common pitfalls to avoid.
             </p>
-            <Link
-              to="/login"
-              className="mt-4 inline-block rounded-lg bg-neutral-900 px-6 py-3 text-sm font-medium text-white hover:bg-neutral-800"
-            >
-              Login to Contribute
-            </Link>
+            {auth.isAuthenticated ? (
+              <div className="mt-4 flex items-center gap-3">
+                <button
+                  onClick={() => setShowResponseForm(true)}
+                  className="inline-block rounded-lg bg-neutral-900 px-6 py-3 text-sm font-medium text-white hover:bg-neutral-800"
+                >
+                  Contribute a Reflection
+                </button>
+                <span className="text-sm text-neutral-600">You are signed in as <strong>{auth.user?.username || auth.user?.email}</strong></span>
+              </div>
+            ) : (
+              <Link
+                to="/login"
+                className="mt-4 inline-block rounded-lg bg-neutral-900 px-6 py-3 text-sm font-medium text-white hover:bg-neutral-800"
+              >
+                Login to Contribute
+              </Link>
+            )}
+          </div>
+        </Card>
+      </section>
+
+      {/* Comments Section */}
+      <section className="mx-auto max-w-4xl px-4 py-8">
+        <div className="mb-6 flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold">{comments.length} {comments.length === 1 ? 'Comment' : 'Comments'}</h2>
+            <p className="mt-1 text-sm text-neutral-600">Short clarifying remarks and quick notes about the problem</p>
+          </div>
+        </div>
+
+        {comments.length === 0 ? (
+          <Card>
+            <div className="p-8 text-center">
+              <p className="text-neutral-600">No comments yet.</p>
+            </div>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {comments.map((c) => <CommentCard key={c._id} comment={c} />)}
+          </div>
+        )}
+
+        <Card>
+          <div className="p-6">
+            <h3 className="font-semibold text-neutral-900">Add a comment</h3>
+            <p className="mt-1 text-sm text-neutral-600">Share a short clarification or tip — keep comments brief and respectful.</p>
+            <textarea
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              rows={4}
+              className="mt-4 w-full rounded-lg border border-neutral-300 bg-white px-3 py-2 text-sm outline-none"
+              placeholder="Write a short comment..."
+            />
+            <div className="mt-4 flex items-center gap-3">
+              <button
+                onClick={() => {
+                  if (!auth.isAuthenticated) {
+                    // Don't redirect automatically; show login prompt
+                    alert('Please log in to post comments. Visit the Login page to continue.');
+                    return;
+                  }
+                  if (!newComment.trim()) return;
+                  setPosting(true);
+                  createComment({ problemId, content: newComment.trim() })
+                    .then((created) => {
+                      setComments((prev) => [created as Comment, ...prev]);
+                      setNewComment("");
+                    })
+                    .catch((err) => {
+                      alert(err.message || String(err));
+                    })
+                    .finally(() => setPosting(false));
+                }}
+                className="rounded-lg bg-uofc-red px-4 py-2 text-sm font-medium text-white hover:bg-uofc-darkred"
+                disabled={posting || !auth.isAuthenticated}
+              >
+                {posting ? 'Posting...' : 'Post Comment'}
+              </button>
+              {!auth.isAuthenticated && (
+                <Link to="/login" className="text-sm text-neutral-600 hover:underline">Login to comment</Link>
+              )}
+            </div>
           </div>
         </Card>
       </section>

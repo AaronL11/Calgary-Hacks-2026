@@ -143,6 +143,60 @@ export async function listProblems(courseCode?: string): Promise<ProblemSummary[
   return res.json();
 }
 
+export async function getProblem(id: string) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/problems/${encodeURIComponent(id)}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export async function listResponses(problemId: string) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/responses/problem/${encodeURIComponent(problemId)}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export type ResponseCreateRequest = {
+  problemId: string;
+  content: string;
+};
+
+export async function createResponse(data: ResponseCreateRequest) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/responses`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    let message: any = err?.detail ?? err?.message ?? res.statusText;
+    if (Array.isArray(message)) {
+      message = message
+        .map((e: any) => {
+          if (e.loc) return `${e.loc.join(".")}: ${e.msg || JSON.stringify(e)}`;
+          return e.msg || JSON.stringify(e);
+        })
+        .join("; ");
+    }
+    throw new Error(typeof message === "string" ? message : JSON.stringify(message));
+  }
+  return res.json();
+}
+
 export type SummarySummary = {
   _id?: string;
   courseCode?: string;
@@ -180,6 +234,57 @@ export async function createSummary(data: SummaryCreateRequest) {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers["Authorization"] = `Bearer ${token}`;
   const res = await fetch(`${API_BASE}/api/summaries`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    let message: any = err?.detail ?? err?.message ?? res.statusText;
+    if (Array.isArray(message)) {
+      message = message
+        .map((e: any) => {
+          if (e.loc) return `${e.loc.join(".")}: ${e.msg || JSON.stringify(e)}`;
+          return e.msg || JSON.stringify(e);
+        })
+        .join("; ");
+    }
+    throw new Error(typeof message === "string" ? message : JSON.stringify(message));
+  }
+  return res.json();
+}
+
+export type CommentSummary = {
+  _id?: string;
+  problemId?: string;
+  content?: string;
+  authorUsername?: string;
+  createdAt?: string;
+  [k: string]: any;
+};
+
+export async function listComments(problemId: string): Promise<CommentSummary[]> {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/comments/problem/${encodeURIComponent(problemId)}`, { method: "GET", headers });
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    throw new Error(err?.detail ?? err?.message ?? res.statusText);
+  }
+  return res.json();
+}
+
+export type CommentCreateRequest = {
+  problemId: string;
+  content: string;
+};
+
+export async function createComment(data: CommentCreateRequest) {
+  const token = getAuthToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+  const res = await fetch(`${API_BASE}/api/comments`, {
     method: "POST",
     headers,
     body: JSON.stringify(data),
