@@ -1,20 +1,8 @@
 import { Link } from "react-router-dom";
+import { MOCK_COURSES, MOCK_PROBLEMS, type Course, type Problem } from "../data/mockData";
 
-type Course = { code: string; name: string; tags: string[] };
-type SubmissionPreview = { title: string; course: string; tags: string[]; votes: number; takeaway: string };
-
-const COURSES: Course[] = [
-  { code: "CPSC 413", name: "Design & Analysis of Algorithms", tags: ["DP", "Graphs", "Greedy", "Proofs"] },
-  { code: "CPSC 351", name: "Theory of Computation", tags: ["Automata", "Decidability", "TMs"] },
-  { code: "CPSC 457", name: "Operating Systems", tags: ["Scheduling", "Memory", "Concurrency"] },
-  { code: "CPSC 559", name: "Distributed Systems", tags: ["Consistency", "Replication", "Faults"] },
-];
-
-const TOP: SubmissionPreview[] = [
-  { title: "DP: when a greedy-looking choice fails", course: "CPSC 413", tags: ["DP", "Counterexample"], votes: 128, takeaway: "Write the state definition first; if you can’t, it’s not DP yet." },
-  { title: "Graphs: hidden cut / exchange argument pattern", course: "CPSC 413", tags: ["Graphs", "Proofs"], votes: 97, takeaway: "Identify what “must be true” in every optimal solution, then swap." },
-  { title: "OS scheduling: starvation pitfall", course: "CPSC 457", tags: ["Scheduling"], votes: 83, takeaway: "Always mention fairness assumptions; graders look for it." },
-];
+const COURSES: Course[] = MOCK_COURSES.slice(0, 4);
+const TOP: Problem[] = MOCK_PROBLEMS.slice(0, 3);
 
 function TagPill({ text }: { text: string }) {
   return <span className="inline-flex items-center rounded-full border border-neutral-200 bg-white px-2.5 py-1 text-xs text-neutral-700">{text}</span>;
@@ -157,11 +145,12 @@ export default function Home() {
 
         <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           {COURSES.map((c) => (
-            <Link key={c.code} to={`/courses?code=${encodeURIComponent(c.code)}`}>
+            <Link key={c._id} to={`/courses?code=${encodeURIComponent(c.courseCode)}`}>
               <Card>
                 <div className="p-5 hover:bg-neutral-50">
-                  <p className="text-sm font-semibold">{c.code}</p>
-                  <p className="mt-1 text-sm text-neutral-700">{c.name}</p>
+                  <p className="text-sm font-semibold">{c.courseCode}</p>
+                  <p className="mt-1 text-sm text-neutral-700">{c.courseName}</p>
+                  <p className="mt-1 text-xs text-neutral-500">{c.professor}</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {c.tags.slice(0, 4).map((t) => <TagPill key={t} text={t} />)}
                   </div>
@@ -178,12 +167,12 @@ export default function Home() {
 
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           {TOP.map((s) => (
-            <Card key={s.title}>
+            <Card key={s._id}>
               <div className="p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-sm font-semibold">{s.title}</p>
-                    <p className="mt-1 text-xs text-neutral-600">{s.course}</p>
+                    <p className="mt-1 text-xs text-neutral-600">{s.courseCode}</p>
                   </div>
                   <div className="rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs">▲ {s.votes}</div>
                 </div>
@@ -195,7 +184,7 @@ export default function Home() {
                 <p className="mt-3 text-sm text-neutral-700">{s.takeaway}</p>
 
                 <div className="mt-4 flex gap-2">
-                  <Link to="/submit" className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-100">Add your reflection</Link>
+                  <Link to="/login" className="rounded-xl border border-neutral-300 bg-white px-3 py-2 text-xs font-medium hover:bg-neutral-100">Add your reflection</Link>
                   <Link to="/courses" className="rounded-xl bg-neutral-900 px-3 py-2 text-xs font-medium text-white hover:bg-neutral-800">Browse more</Link>
                 </div>
               </div>
