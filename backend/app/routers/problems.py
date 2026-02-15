@@ -83,6 +83,12 @@ async def create_problem(payload: schemas.ProblemCreate, request: Request, curre
         return schemas.ProblemOut.parse_obj(created)
     except Exception:
         return created
+    finally:
+        # increment user's contribution count (best-effort)
+        try:
+            await db.users.update_one({"_id": current_user.get("_id")}, {"$inc": {"contributionCount": 1}})
+        except Exception:
+            pass
 
 
 @router.get("/{problem_id}", response_model=schemas.ProblemOut)

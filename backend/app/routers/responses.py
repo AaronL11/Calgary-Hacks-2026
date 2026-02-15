@@ -52,6 +52,11 @@ async def create_response(payload: schemas.ResponseCreate, request: Request, cur
         created["authorUsername"] = current_user.get("username")
     except Exception:
         pass
+    # increment user's contribution count
+    try:
+        await db.users.update_one({"_id": current_user.get("_id")}, {"$inc": {"contributionCount": 1}})
+    except Exception:
+        pass
     try:
         return schemas.ResponseOut.parse_obj(created)
     except Exception:

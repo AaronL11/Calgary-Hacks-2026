@@ -40,10 +40,27 @@ async def create_summary(payload: schemas.SummaryCreate, request: Request, curre
     })
     res = await db.summaries.insert_one(doc)
     created = await db.summaries.find_one({"_id": res.inserted_id})
+    # increment user's contribution count
+    try:
+        await db.users.update_one({"_id": current_user.get("_id")}, {"$inc": {"contributionCount": 1}})
+    except Exception:
+        pass
     try:
         return schemas.SummaryOut.parse_obj(created)
     except Exception:
         return created
+
+
+@router.post("/{summary_id}/vote", response_model=schemas.SummaryOut)
+async def vote_summary(summary_id: str, request: Request):
+    db = request.app.state.db
+    body = await request.json()
+    delta = int(body.get("delta", 1))
+    res = await db.summaries.find_one_and_update({"_id": _objid(summary_id)}, {"$inc": {"votes": delta}}, return_document=True)
+    try:
+        return schemas.SummaryOut.parse_obj(res)
+    except Exception:
+        return res
 
 
 @router.get("", response_model=List[schemas.SummaryOut])

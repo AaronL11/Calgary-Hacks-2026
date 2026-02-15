@@ -1,6 +1,6 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { type Course, type Problem } from "../data/mockData";
-import { listProblems, listCourses } from "../lib/api";
+import { listProblems, listCourses, voteProblem } from "../lib/api";
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import Header from "../components/Header";
@@ -44,20 +44,17 @@ function ProblemCard({ problem }: { problem: Problem }) {
   const [userVote, setUserVote] = useState<"up" | "down" | null>(null);
 
   const handleVote = (type: "up" | "down") => {
-    if (userVote === type) {
-      // Unvote
-      if (type === "up") setUpvotes(upvotes - 1);
-      else setDownvotes(downvotes - 1);
+    const delta = type === "up" ? 1 : -1;
+    // optimistically update UI
+    if (type === "up") setUpvotes((s) => s + 1);
+    else setDownvotes((s) => s + 1);
+    setUserVote(type);
+    voteProblem(problem._id, delta).catch(() => {
+      // revert optimistic update on error
+      if (type === "up") setUpvotes((s) => s - 1);
+      else setDownvotes((s) => s - 1);
       setUserVote(null);
-    } else {
-      // Change or new vote
-      if (userVote === "up") setUpvotes(upvotes - 1);
-      if (userVote === "down") setDownvotes(downvotes - 1);
-
-      if (type === "up") setUpvotes(upvotes + 1);
-      else setDownvotes(downvotes + 1);
-      setUserVote(type);
-    }
+    });
   };
 
   const netVotes = upvotes - downvotes;

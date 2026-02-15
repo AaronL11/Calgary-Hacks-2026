@@ -39,6 +39,8 @@ async def create_comment(payload: schemas.CommentCreate, request: Request, curre
     doc.update({
         "problemId": _objid(payload.problemId),
         "authorId": current_user.get("_id"),
+        "upvotes": 0,
+        "downvotes": 0,
         "createdAt": now,
         "updatedAt": now,
     })
@@ -48,7 +50,24 @@ async def create_comment(payload: schemas.CommentCreate, request: Request, curre
         created["authorUsername"] = current_user.get("username")
     except Exception:
         pass
+    # increment user's contribution count
+    try:
+        await db.users.update_one({"_id": current_user.get("_id")}, {"$inc": {"contributionCount": 1}})
+    except Exception:
+        pass
     try:
         return schemas.CommentOut.parse_obj(created)
     except Exception:
         return created
+
+
+@router.post("/{comment_id}/vote", response_model=schemas.CommentOut)
+async def vote_comment(comment_id: str, request: Request):
+    db = request.app.state.db
+    body = await request.json()
+    delta = int(body.get("delta", 1))
+    res = await db.comments.find_one_and_update({"_id": _objid(comment_id)}, {"$inc": {"upvotes": delta}}, return_document=True)
+    try:
+        return schemas.CommentOut.parse_obj(res)
+    except Exception:
+        return res

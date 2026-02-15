@@ -186,6 +186,8 @@ class CommentOut(BaseModel):
     content: Optional[str] = None
     authorId: Optional[PyObjectId] = None
     authorUsername: Optional[str] = None
+    upvotes: Optional[int] = 0
+    downvotes: Optional[int] = 0
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
 
