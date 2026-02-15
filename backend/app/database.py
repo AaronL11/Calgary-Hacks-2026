@@ -79,6 +79,15 @@ async def init_db(app):
     except Exception:
         logger.exception("Failed to create responses indexes")
 
+    # Seed database with mock data when empty
+    try:
+        from .seeds import seed_db
+
+        await seed_db(app)
+        logger.info("Database seeding (if needed) complete")
+    except Exception:
+        logger.exception("Failed to seed database")
+
 
 async def close(app):
     global client

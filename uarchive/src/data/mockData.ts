@@ -602,56 +602,50 @@ export const MOCK_SUMMARIES: Summary[] = [
 ];
 
 // Helper function to simulate API calls (replace with actual FastAPI calls later)
+const API_BASE = (import.meta as any).env?.VITE_API_URL || "http://localhost:8000";
+
+async function fetchJson(path: string) {
+  const res = await fetch(`${API_BASE}${path}`);
+  if (!res.ok) throw new Error(res.statusText);
+  return res.json();
+}
+
 export const api = {
   getCourses: async (): Promise<Course[]> => {
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return MOCK_COURSES;
+    return fetchJson("/api/courses");
   },
-  
+
   getCourseById: async (id: string): Promise<Course | null> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    return MOCK_COURSES.find(c => c._id === id) || null;
+    return fetchJson(`/api/courses/${id}`);
   },
-  
+
   getCourseByCode: async (code: string): Promise<Course | null> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    return MOCK_COURSES.find(c => c.courseCode === code) || null;
+    // backend does not provide direct code lookup; fetch all and filter
+    const all = await fetchJson("/api/courses");
+    return all.find((c: Course) => c.courseCode === code) || null;
   },
-  
+
   getProblems: async (): Promise<Problem[]> => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return MOCK_PROBLEMS;
+    return fetchJson("/api/problems");
   },
-  
+
   getProblemsByCourse: async (courseId: string): Promise<Problem[]> => {
-    await new Promise(resolve => setTimeout(resolve, 250));
-    return MOCK_PROBLEMS.filter(p => p.courseId === courseId);
+    return fetchJson(`/api/problems?courseId=${encodeURIComponent(courseId)}`);
   },
-  
+
   searchCourses: async (query: string): Promise<Course[]> => {
-    await new Promise(resolve => setTimeout(resolve, 400));
-    const lowerQuery = query.toLowerCase();
-    return MOCK_COURSES.filter(c => 
-      c.courseCode.toLowerCase().includes(lowerQuery) ||
-      c.courseName.toLowerCase().includes(lowerQuery) ||
-      c.professor.toLowerCase().includes(lowerQuery) ||
-      c.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
-    );
+    return fetchJson(`/api/search?query=${encodeURIComponent(query)}`);
   },
-  
+
   getProblemById: async (id: string): Promise<Problem | null> => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    return MOCK_PROBLEMS.find(p => p._id === id) || null;
+    return fetchJson(`/api/problems/${id}`);
   },
-  
+
   getResponsesByProblem: async (problemId: string): Promise<Response[]> => {
-    await new Promise(resolve => setTimeout(resolve, 250));
-    return MOCK_RESPONSES.filter(r => r.problemId === problemId);
+    return fetchJson(`/api/responses?problemId=${encodeURIComponent(problemId)}`);
   },
 
   getSummariesByCourse: async (courseCode: string): Promise<Summary[]> => {
-    await new Promise(resolve => setTimeout(resolve, 250));
-    return MOCK_SUMMARIES.filter(s => s.courseCode === courseCode);
-  }
+    return fetchJson(`/api/search/summaries?courseCode=${encodeURIComponent(courseCode)}`);
+  },
 };
